@@ -6,6 +6,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $wp_tests_dir = getenv( 'WP_TESTS_DIR' );
 
+if ( $wp_tests_dir === false ) {
+	$vendor_dir = dirname( __DIR__ ) . '/vendor/wp-phpunit/wp-phpunit';
+	if ( is_dir( $vendor_dir ) ) {
+		$wp_tests_dir = $vendor_dir;
+	}
+}
+
 if ( $wp_tests_dir !== false && is_dir( $wp_tests_dir ) ) {
 	if ( getenv( 'WP_MULTISITE' ) ) {
 		define( 'WP_TESTS_MULTISITE', true );
