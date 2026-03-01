@@ -1,6 +1,7 @@
 vendor/
 composer.lock
 .phpunit.cache/
+wp-tests-config.php
 .idea/
 node_modules/
 .DS_Store

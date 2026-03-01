@@ -11,5 +11,6 @@
 /phpcs.xml.dist     export-ignore
 /phpstan.neon.dist  export-ignore
 /phpunit.xml.dist   export-ignore
+/wp-tests-config.php.dist export-ignore
 CHANGELOG.md        export-ignore
 CLAUDE.md           export-ignore

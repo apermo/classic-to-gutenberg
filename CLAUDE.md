@@ -59,8 +59,20 @@ git config core.hooksPath .githooks
 ## CI (GitHub Actions)
 
 - `ci.yml` — PHPCS + PHPStan + PHPUnit across PHP 8.1, 8.2, 8.3, 8.4
+- `integration.yml` — WP integration tests (real WP + MySQL, multisite matrix)
+- `wp-beta.yml` — Nightly WP beta/RC compatibility check
 - `release.yml` — CHANGELOG-driven releases
 - `pr-validation.yml` — conventional commit and changelog checks
+
+### Integration test environment
+
+Integration tests run against a real WordPress instance. Set `WP_TESTS_DIR` to enable:
+
+```bash
+WP_TESTS_DIR=/tmp/wordpress-tests-lib WP_MULTISITE=1 composer test:integration
+```
+
+When `WP_TESTS_DIR` is unset, the bootstrap skips WP loading — unit tests work unchanged.
 
 ## Template Sync (for derived projects)
 
