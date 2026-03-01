@@ -1,0 +1,16 @@
+vendor/
+composer.lock
+.phpunit.cache/
+.idea/
+node_modules/
+.DS_Store
+
+# WordPress core (downloaded by DDEV orchestrate)
+/wp-admin/
+/wp-includes/
+/wp-content/
+/wp-*.php
+/xmlrpc.php
+/license.txt
+/readme.html
+/index.php
