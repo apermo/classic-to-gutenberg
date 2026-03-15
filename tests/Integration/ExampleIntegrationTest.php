@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Plugin_Name\Tests\Integration;
 
+use Plugin_Name\Plugin;
 use WP_UnitTestCase;
 
 /**
@@ -17,7 +18,7 @@ class ExampleIntegrationTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_wordpress_is_loaded(): void {
-		$this->assertTrue( function_exists( 'do_action' ) );
+		$this->assertTrue( \function_exists( 'do_action' ) );
 	}
 
 	/**
@@ -26,16 +27,16 @@ class ExampleIntegrationTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_project_is_active(): void {
-		$plugin_file = dirname( __DIR__, 2 ) . '/plugin.php';
+		$plugin_file = \dirname( __DIR__, 2 ) . '/plugin.php';
 
-		if ( file_exists( $plugin_file ) ) {
+		if ( \file_exists( $plugin_file ) ) {
 			$this->assertNotEmpty(
-				\Plugin_Name\Plugin::VERSION,
+				Plugin::VERSION,
 				'Plugin version should be set.',
 			);
 		} else {
 			$this->assertNotFalse(
-				wp_get_theme()->get( 'Name' ),
+				\wp_get_theme()->get( 'Name' ),
 				'Active theme should have a name.',
 			);
 		}
