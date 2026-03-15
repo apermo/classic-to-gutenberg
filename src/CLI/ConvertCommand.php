@@ -47,6 +47,9 @@ class ConvertCommand {
 	 *
 	 * ## OPTIONS
 	 *
+	 * [<id>...]
+	 * : One or more post IDs to convert. Comma-separated or space-separated.
+	 *
 	 * [--dry-run]
 	 * : Preview conversion without saving changes.
 	 *
@@ -59,15 +62,96 @@ class ConvertCommand {
 	 * ## EXAMPLES
 	 *
 	 *     wp classic-to-gutenberg convert --dry-run
+	 *     wp classic-to-gutenberg convert 42
+	 *     wp classic-to-gutenberg convert 42 43 44
+	 *     wp classic-to-gutenberg convert 42,43,44 --dry-run
 	 *     wp classic-to-gutenberg convert --post-type=post --batch-size=100
 	 *
-	 * @param string[]             $args       Positional arguments.
+	 * @param string[]             $args       Positional arguments (post IDs).
 	 * @param array<string,string> $assoc_args Associative arguments.
 	 *
 	 * @return void
 	 */
 	public function execute( array $args, array $assoc_args ): void {
-		$dry_run    = (bool) Utils\get_flag_value( $assoc_args, 'dry-run', false );
+		$dry_run  = (bool) Utils\get_flag_value( $assoc_args, 'dry-run', false );
+		$post_ids = $this->parse_post_ids( $args );
+
+		if ( $post_ids !== [] ) {
+			$this->convert_by_ids( $post_ids, $dry_run );
+			return;
+		}
+
+		$this->convert_by_query( $assoc_args, $dry_run );
+	}
+
+	/**
+	 * Parse post IDs from positional arguments.
+	 *
+	 * Supports space-separated and comma-separated IDs.
+	 *
+	 * @param string[] $args Positional arguments.
+	 *
+	 * @return int[]
+	 */
+	private function parse_post_ids( array $args ): array {
+		if ( $args === [] ) {
+			return [];
+		}
+
+		$ids = [];
+		foreach ( $args as $arg ) {
+			foreach ( explode( ',', $arg ) as $part ) {
+				$part = trim( $part );
+				if ( $part !== '' && ctype_digit( $part ) ) {
+					$ids[] = (int) $part;
+				}
+			}
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Convert specific posts by their IDs.
+	 *
+	 * @param int[] $post_ids Post IDs to convert.
+	 * @param bool  $dry_run  Whether to preview only.
+	 *
+	 * @return void
+	 */
+	private function convert_by_ids( array $post_ids, bool $dry_run ): void {
+		$runner = new MigrationRunner( $this->converter );
+		$mode   = $dry_run ? 'Dry run' : 'Converting';
+
+		WP_CLI::log( sprintf( '%s %d post(s)...', $mode, count( $post_ids ) ) );
+
+		$results   = $runner->convert_batch( $post_ids, $dry_run );
+		$converted = 0;
+		$failed    = 0;
+
+		foreach ( $results as $result ) {
+			if ( $result->success ) {
+				++$converted;
+				WP_CLI::log( sprintf( '  [OK] Post #%d', $result->post_id ) );
+			} else {
+				++$failed;
+				WP_CLI::warning( sprintf( '  [FAIL] Post #%d: %s', $result->post_id, $result->error ) );
+			}
+		}
+
+		$prefix = $dry_run ? 'Would convert' : 'Converted';
+		WP_CLI::success( sprintf( '%s %d post(s), %d failed.', $prefix, $converted, $failed ) );
+	}
+
+	/**
+	 * Convert posts found by query.
+	 *
+	 * @param array<string,string> $assoc_args Associative arguments.
+	 * @param bool                 $dry_run    Whether to preview only.
+	 *
+	 * @return void
+	 */
+	private function convert_by_query( array $assoc_args, bool $dry_run ): void {
 		$batch_size = (int) ( $assoc_args['batch-size'] ?? 50 );
 		$finder     = new ClassicPostFinder();
 		$runner     = new MigrationRunner( $this->converter );
