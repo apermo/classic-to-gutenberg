@@ -15,11 +15,11 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg;
 
-defined( 'ABSPATH' ) || exit();
+\defined( 'ABSPATH' ) || exit();
 
-define( 'CLASSIC_TO_GUTENBERG_VERSION', '0.1.0' );
-define( 'CLASSIC_TO_GUTENBERG_FILE', __FILE__ );
-define( 'CLASSIC_TO_GUTENBERG_DIR', plugin_dir_path( __FILE__ ) );
+\define( 'CLASSIC_TO_GUTENBERG_VERSION', '0.1.0' );
+\define( 'CLASSIC_TO_GUTENBERG_FILE', __FILE__ );
+\define( 'CLASSIC_TO_GUTENBERG_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once __DIR__ . '/vendor/autoload.php';
 

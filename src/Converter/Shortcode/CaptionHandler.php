@@ -45,7 +45,7 @@ class CaptionHandler implements ShortcodeHandlerInterface {
 		$figure = '<figure class="wp-block-image' . $align_class . '">'
 			. $clean_img . $caption_html . '</figure>';
 
-		return '<!-- wp:image ' . wp_json_encode( $block_attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . " -->\n"
+		return '<!-- wp:image ' . wp_json_encode( $block_attrs, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE ) . " -->\n"
 			. $figure . "\n"
 			. '<!-- /wp:image -->';
 	}
@@ -59,8 +59,8 @@ class CaptionHandler implements ShortcodeHandlerInterface {
 	 */
 	private function parse_attrs( string $shortcode ): array {
 		$attrs = [];
-		if ( preg_match( '/\[caption([^\]]*)\]/', $shortcode, $match ) ) {
-			preg_match_all( '/(\w+)=["\']([^"\']*)["\']/', $match[1], $attr_matches, PREG_SET_ORDER );
+		if ( \preg_match( '/\[caption([^\]]*)\]/', $shortcode, $match ) ) {
+			\preg_match_all( '/(\w+)=["\']([^"\']*)["\']/', $match[1], $attr_matches, \PREG_SET_ORDER );
 			foreach ( $attr_matches as $attr ) {
 				$attrs[ $attr[1] ] = $attr[2];
 			}
@@ -76,7 +76,7 @@ class CaptionHandler implements ShortcodeHandlerInterface {
 	 * @return string
 	 */
 	private function extract_img( string $shortcode ): string {
-		preg_match( '/<img\s[^>]*\/?>/i', $shortcode, $match );
+		\preg_match( '/<img\s[^>]*\/?>/i', $shortcode, $match );
 		return $match[0] ?? '';
 	}
 
@@ -88,8 +88,8 @@ class CaptionHandler implements ShortcodeHandlerInterface {
 	 * @return string
 	 */
 	private function extract_caption_text( string $shortcode ): string {
-		if ( preg_match( '/<img\s[^>]*\/?>\s*(.*?)\s*\[\/caption\]/s', $shortcode, $match ) ) {
-			return trim( $match[1] );
+		if ( \preg_match( '/<img\s[^>]*\/?>\s*(.*?)\s*\[\/caption\]/s', $shortcode, $match ) ) {
+			return \trim( $match[1] );
 		}
 		return '';
 	}
@@ -106,9 +106,9 @@ class CaptionHandler implements ShortcodeHandlerInterface {
 		$block_attrs = [];
 
 		// ID from shortcode (attachment_N format) or img class.
-		if ( isset( $attrs['id'] ) && preg_match( '/attachment_(\d+)/', $attrs['id'], $match ) ) {
+		if ( isset( $attrs['id'] ) && \preg_match( '/attachment_(\d+)/', $attrs['id'], $match ) ) {
 			$block_attrs['id'] = (int) $match[1];
-		} elseif ( preg_match( '/wp-image-(\d+)/', $img_tag, $match ) ) {
+		} elseif ( \preg_match( '/wp-image-(\d+)/', $img_tag, $match ) ) {
 			$block_attrs['id'] = (int) $match[1];
 		}
 
@@ -120,11 +120,11 @@ class CaptionHandler implements ShortcodeHandlerInterface {
 		// Width and height from shortcode attrs or img tag.
 		if ( isset( $attrs['width'] ) ) {
 			$block_attrs['width'] = (int) $attrs['width'];
-		} elseif ( preg_match( '/\bwidth=["\'](\d+)["\']/', $img_tag, $match ) ) {
+		} elseif ( \preg_match( '/\bwidth=["\'](\d+)["\']/', $img_tag, $match ) ) {
 			$block_attrs['width'] = (int) $match[1];
 		}
 
-		if ( preg_match( '/\bheight=["\'](\d+)["\']/', $img_tag, $match ) ) {
+		if ( \preg_match( '/\bheight=["\'](\d+)["\']/', $img_tag, $match ) ) {
 			$block_attrs['height'] = (int) $match[1];
 		}
 
@@ -140,7 +140,7 @@ class CaptionHandler implements ShortcodeHandlerInterface {
 	 */
 	private function extract_align( array $attrs ): string {
 		if ( isset( $attrs['align'] ) ) {
-			return str_replace( 'align', '', $attrs['align'] );
+			return \str_replace( 'align', '', $attrs['align'] );
 		}
 		return '';
 	}
@@ -153,6 +153,6 @@ class CaptionHandler implements ShortcodeHandlerInterface {
 	 * @return string
 	 */
 	private function build_clean_img( string $img_tag ): string {
-		return (string) preg_replace( '/\s*\/?\s*>$/', '/>', $img_tag );
+		return (string) \preg_replace( '/\s*\/?\s*>$/', '/>', $img_tag );
 	}
 }

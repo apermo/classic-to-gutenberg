@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Converter;
 
+use WP_HTML_Tag_Processor;
+
 /**
  * Converts <pre> tags to core/preformatted blocks.
  */
@@ -24,7 +26,7 @@ class PreformattedConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	public function convert( string $html ): string {
-		$processor = new \WP_HTML_Tag_Processor( $html );
+		$processor = new WP_HTML_Tag_Processor( $html );
 		if ( $processor->next_tag( [ 'tag_name' => 'pre' ] ) ) {
 			$existing = $processor->get_attribute( 'class' );
 			$classes  = $existing !== null ? $existing . ' wp-block-preformatted' : 'wp-block-preformatted';

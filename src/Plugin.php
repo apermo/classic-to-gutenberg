@@ -32,7 +32,7 @@ class Plugin {
 	 * @return void
 	 */
 	public static function init(): void {
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		if ( \defined( 'WP_CLI' ) && \WP_CLI ) {
 			add_action(
 				'cli_init',
 				static function (): void {

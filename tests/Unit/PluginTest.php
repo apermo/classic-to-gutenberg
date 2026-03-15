@@ -18,7 +18,7 @@ class PluginTest extends TestCase {
 	 * @return void
 	 */
 	public function test_init_method_exists(): void {
-		$this->assertTrue( method_exists( Plugin::class, 'init' ) );
+		$this->assertTrue( \method_exists( Plugin::class, 'init' ) );
 	}
 
 	/**
@@ -27,6 +27,6 @@ class PluginTest extends TestCase {
 	 * @return void
 	 */
 	public function test_create_factory_method_exists(): void {
-		$this->assertTrue( method_exists( Plugin::class, 'create_factory' ) );
+		$this->assertTrue( \method_exists( Plugin::class, 'create_factory' ) );
 	}
 }

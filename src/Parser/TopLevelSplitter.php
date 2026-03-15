@@ -50,7 +50,7 @@ class TopLevelSplitter {
 		$html = $this->normalize_br( $html );
 
 		$elements = [];
-		$length   = strlen( $html );
+		$length   = \strlen( $html );
 		$offset   = 0;
 
 		while ( $offset < $length ) {
@@ -66,9 +66,9 @@ class TopLevelSplitter {
 
 			if ( $element !== null ) {
 				$elements[] = $element;
-				$offset     += strlen( $element->html );
+				$offset     += \strlen( $element->html );
 			} else {
-				++$offset;
+				$offset++;
 			}
 		}
 
@@ -84,8 +84,8 @@ class TopLevelSplitter {
 	 * @return int New position after whitespace.
 	 */
 	private function skip_whitespace( string $html, int $offset ): int {
-		if ( preg_match( '/\G\s+/', $html, $match, 0, $offset ) ) {
-			return $offset + strlen( $match[0] );
+		if ( \preg_match( '/\G\s+/', $html, $match, 0, $offset ) ) {
+			return $offset + \strlen( $match[0] );
 		}
 		return $offset;
 	}
@@ -99,11 +99,11 @@ class TopLevelSplitter {
 	 * @return TopLevelElement|null
 	 */
 	private function match_comment( string $html, int $offset ): ?TopLevelElement {
-		if ( preg_match( '/\G<!--more-->/i', $html, $match, 0, $offset ) ) {
+		if ( \preg_match( '/\G<!--more-->/i', $html, $match, 0, $offset ) ) {
 			return new TopLevelElement( '__more__', $match[0] );
 		}
 
-		if ( preg_match( '/\G<!--nextpage-->/i', $html, $match, 0, $offset ) ) {
+		if ( \preg_match( '/\G<!--nextpage-->/i', $html, $match, 0, $offset ) ) {
 			return new TopLevelElement( '__nextpage__', $match[0] );
 		}
 
@@ -119,7 +119,7 @@ class TopLevelSplitter {
 	 * @return TopLevelElement|null
 	 */
 	private function match_shortcode( string $html, int $offset ): ?TopLevelElement {
-		if ( preg_match( '/\G\[(\w[\w-]*)(?:\s[^\]]*)?\](?:.*?\[\/\1\])?/s', $html, $match, 0, $offset ) ) {
+		if ( \preg_match( '/\G\[(\w[\w-]*)(?:\s[^\]]*)?\](?:.*?\[\/\1\])?/s', $html, $match, 0, $offset ) ) {
 			return new TopLevelElement( '__shortcode__', $match[0] );
 		}
 
@@ -135,15 +135,15 @@ class TopLevelSplitter {
 	 * @return TopLevelElement|null
 	 */
 	private function match_block_tag( string $html, int $offset ): ?TopLevelElement {
-		$tags_pattern = implode( '|', self::BLOCK_TAGS );
+		$tags_pattern = \implode( '|', self::BLOCK_TAGS );
 
-		if ( ! preg_match( '/\G<(' . $tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)/i', $html, $match, 0, $offset ) ) {
+		if ( ! \preg_match( '/\G<(' . $tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)/i', $html, $match, 0, $offset ) ) {
 			return null;
 		}
 
-		$tag_name = strtolower( $match[1] );
+		$tag_name = \strtolower( $match[1] );
 
-		if ( in_array( $tag_name, self::VOID_TAGS, true ) ) {
+		if ( \in_array( $tag_name, self::VOID_TAGS, true ) ) {
 			return new TopLevelElement( $tag_name, $match[0] );
 		}
 
@@ -178,7 +178,7 @@ class TopLevelSplitter {
 	 * @return string
 	 */
 	private function normalize_br( string $html ): string {
-		return (string) preg_replace( '/<br\s*>/', '<br/>', $html );
+		return (string) \preg_replace( '/<br\s*>/', '<br/>', $html );
 	}
 
 	/**
@@ -194,39 +194,39 @@ class TopLevelSplitter {
 	 * @return string The complete element HTML.
 	 */
 	private function extract_element( string $html, int $offset, string $tag_name ): string {
-		$length = strlen( $html );
+		$length = \strlen( $html );
 
-		preg_match( '/\G<' . $tag_name . '(?:\s[^>]*)?>/', $html, $open_match, 0, $offset );
-		$search_pos   = $offset + strlen( $open_match[0] );
+		\preg_match( '/\G<' . $tag_name . '(?:\s[^>]*)?>/', $html, $open_match, 0, $offset );
+		$search_pos   = $offset + \strlen( $open_match[0] );
 		$depth        = 1;
 		$open_pattern = '/<' . $tag_name . '(?:\s[^>]*)?>|<\/' . $tag_name . '\s*>/i';
 
 		while ( $search_pos < $length && $depth > 0 ) {
-			if ( ! preg_match( $open_pattern, $html, $match, PREG_OFFSET_CAPTURE, $search_pos ) ) {
+			if ( ! \preg_match( $open_pattern, $html, $match, \PREG_OFFSET_CAPTURE, $search_pos ) ) {
 				return $this->extract_until_next_block( $html, $offset );
 			}
 
 			$match_str    = $match[0][0];
 			$match_offset = $match[0][1];
-			$is_closing   = str_starts_with( $match_str, '</' );
+			$is_closing   = \str_starts_with( $match_str, '</' );
 
 			if ( $is_closing ) {
-				--$depth;
+				$depth--;
 			} else {
 				if ( $tag_name === 'p' && $depth === 1 ) {
-					return substr( $html, $offset, $match_offset - $offset );
+					return \substr( $html, $offset, $match_offset - $offset );
 				}
-				++$depth;
+				$depth++;
 			}
 
-			$search_pos = $match_offset + strlen( $match_str );
+			$search_pos = $match_offset + \strlen( $match_str );
 		}
 
 		if ( $depth > 0 ) {
 			return $this->extract_until_next_block( $html, $offset );
 		}
 
-		return substr( $html, $offset, $search_pos - $offset );
+		return \substr( $html, $offset, $search_pos - $offset );
 	}
 
 	/**
@@ -240,18 +240,18 @@ class TopLevelSplitter {
 	 * @return string
 	 */
 	private function extract_until_next_block( string $html, int $offset ): string {
-		$tags_pattern = implode( '|', self::BLOCK_TAGS );
+		$tags_pattern = \implode( '|', self::BLOCK_TAGS );
 		$pattern      = '/(?<=\n|\s)<(?:' . $tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)/i';
 
-		preg_match( '/\G<\w+(?:\s[^>]*)?>/', $html, $open_match, 0, $offset );
-		$after_open = $offset + strlen( $open_match[0] );
+		\preg_match( '/\G<\w+(?:\s[^>]*)?>/', $html, $open_match, 0, $offset );
+		$after_open = $offset + \strlen( $open_match[0] );
 
-		if ( preg_match( $pattern, $html, $match, PREG_OFFSET_CAPTURE, $after_open ) ) {
-			$result = substr( $html, $offset, $match[0][1] - $offset );
-			return rtrim( $result );
+		if ( \preg_match( $pattern, $html, $match, \PREG_OFFSET_CAPTURE, $after_open ) ) {
+			$result = \substr( $html, $offset, $match[0][1] - $offset );
+			return \rtrim( $result );
 		}
 
-		return rtrim( substr( $html, $offset ) );
+		return \rtrim( \substr( $html, $offset ) );
 	}
 
 	/**
@@ -263,17 +263,17 @@ class TopLevelSplitter {
 	 * @return string
 	 */
 	private function extract_text( string $html, int $offset ): string {
-		$tags_pattern = implode( '|', self::BLOCK_TAGS );
+		$tags_pattern = \implode( '|', self::BLOCK_TAGS );
 		$stop_pattern = '/<(?:' . $tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)|<!--(?:more|nextpage)-->|\[(\w[\w-]*)(?:\s[^\]]*)?]/i';
 
-		if ( preg_match( $stop_pattern, $html, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
+		if ( \preg_match( $stop_pattern, $html, $match, \PREG_OFFSET_CAPTURE, $offset ) ) {
 			$stop_offset = $match[0][1];
 			if ( $stop_offset === $offset ) {
 				return '';
 			}
-			return rtrim( substr( $html, $offset, $stop_offset - $offset ) );
+			return \rtrim( \substr( $html, $offset, $stop_offset - $offset ) );
 		}
 
-		return rtrim( substr( $html, $offset ) );
+		return \rtrim( \substr( $html, $offset ) );
 	}
 }

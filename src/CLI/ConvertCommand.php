@@ -100,9 +100,9 @@ class ConvertCommand {
 
 		$post_ids = [];
 		foreach ( $args as $argument ) {
-			foreach ( explode( ',', $argument ) as $part ) {
-				$part = trim( $part );
-				if ( $part !== '' && ctype_digit( $part ) ) {
+			foreach ( \explode( ',', $argument ) as $part ) {
+				$part = \trim( $part );
+				if ( $part !== '' && \ctype_digit( $part ) ) {
 					$post_ids[] = (int) $part;
 				}
 			}
@@ -123,7 +123,7 @@ class ConvertCommand {
 		$runner = new MigrationRunner( $this->converter );
 		$mode   = $dry_run ? 'Dry run' : 'Converting';
 
-		WP_CLI::log( sprintf( '%s %d post(s)...', $mode, count( $post_ids ) ) );
+		WP_CLI::log( \sprintf( '%s %d post(s)...', $mode, \count( $post_ids ) ) );
 
 		$results   = $runner->convert_batch( $post_ids, $dry_run );
 		$converted = 0;
@@ -131,16 +131,16 @@ class ConvertCommand {
 
 		foreach ( $results as $result ) {
 			if ( $result->success ) {
-				++$converted;
-				WP_CLI::log( sprintf( '  [OK] Post #%d', $result->post_id ) );
+				$converted++;
+				WP_CLI::log( \sprintf( '  [OK] Post #%d', $result->post_id ) );
 			} else {
-				++$failed;
-				WP_CLI::warning( sprintf( '  [FAIL] Post #%d: %s', $result->post_id, $result->error ) );
+				$failed++;
+				WP_CLI::warning( \sprintf( '  [FAIL] Post #%d: %s', $result->post_id, $result->error ) );
 			}
 		}
 
 		$prefix = $dry_run ? 'Would convert' : 'Converted';
-		WP_CLI::success( sprintf( '%s %d post(s), %d failed.', $prefix, $converted, $failed ) );
+		WP_CLI::success( \sprintf( '%s %d post(s), %d failed.', $prefix, $converted, $failed ) );
 	}
 
 	/**
@@ -158,7 +158,7 @@ class ConvertCommand {
 		$query_args = [ 'limit' => $batch_size ];
 
 		if ( isset( $assoc_args['post-type'] ) ) {
-			$query_args['post_type'] = explode( ',', $assoc_args['post-type'] );
+			$query_args['post_type'] = \explode( ',', $assoc_args['post-type'] );
 		}
 
 		$total = $finder->count( $query_args );
@@ -169,7 +169,7 @@ class ConvertCommand {
 		}
 
 		$mode = $dry_run ? 'Dry run' : 'Converting';
-		WP_CLI::log( sprintf( '%s %d classic post(s)...', $mode, $total ) );
+		WP_CLI::log( \sprintf( '%s %d classic post(s)...', $mode, $total ) );
 
 		$offset    = 0;
 		$converted = 0;
@@ -187,11 +187,11 @@ class ConvertCommand {
 
 			foreach ( $results as $result ) {
 				if ( $result->success ) {
-					++$converted;
-					WP_CLI::log( sprintf( '  [OK] Post #%d', $result->post_id ) );
+					$converted++;
+					WP_CLI::log( \sprintf( '  [OK] Post #%d', $result->post_id ) );
 				} else {
-					++$failed;
-					WP_CLI::warning( sprintf( '  [FAIL] Post #%d: %s', $result->post_id, $result->error ) );
+					$failed++;
+					WP_CLI::warning( \sprintf( '  [FAIL] Post #%d: %s', $result->post_id, $result->error ) );
 				}
 			}
 
@@ -199,6 +199,6 @@ class ConvertCommand {
 		}
 
 		$prefix = $dry_run ? 'Would convert' : 'Converted';
-		WP_CLI::success( sprintf( '%s %d post(s), %d failed.', $prefix, $converted, $failed ) );
+		WP_CLI::success( \sprintf( '%s %d post(s), %d failed.', $prefix, $converted, $failed ) );
 	}
 }

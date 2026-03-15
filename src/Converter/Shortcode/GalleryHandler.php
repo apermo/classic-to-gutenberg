@@ -39,7 +39,7 @@ class GalleryHandler implements ShortcodeHandlerInterface {
 		$figure        = '<figure class="wp-block-gallery has-nested-images ' . $columns_class . '">'
 			. $inner_blocks . '</figure>';
 
-		return '<!-- wp:gallery ' . wp_json_encode( $block_attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . " -->\n"
+		return '<!-- wp:gallery ' . wp_json_encode( $block_attrs, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE ) . " -->\n"
 			. $figure . "\n"
 			. '<!-- /wp:gallery -->';
 	}
@@ -53,8 +53,8 @@ class GalleryHandler implements ShortcodeHandlerInterface {
 	 */
 	private function parse_attrs( string $shortcode ): array {
 		$attrs = [];
-		if ( preg_match( '/\[gallery([^\]]*)\]/', $shortcode, $match ) ) {
-			preg_match_all( '/(\w+)=["\']([^"\']*)["\']/', $match[1], $attr_matches, PREG_SET_ORDER );
+		if ( \preg_match( '/\[gallery([^\]]*)\]/', $shortcode, $match ) ) {
+			\preg_match_all( '/(\w+)=["\']([^"\']*)["\']/', $match[1], $attr_matches, \PREG_SET_ORDER );
 			foreach ( $attr_matches as $attr ) {
 				$attrs[ $attr[1] ] = $attr[2];
 			}
@@ -74,7 +74,7 @@ class GalleryHandler implements ShortcodeHandlerInterface {
 			return [];
 		}
 
-		return array_map( 'intval', explode( ',', $attrs['ids'] ) );
+		return \array_map( 'intval', \explode( ',', $attrs['ids'] ) );
 	}
 
 	/**
@@ -109,13 +109,13 @@ class GalleryHandler implements ShortcodeHandlerInterface {
 				$img_attrs['linkDestination'] = $link_to;
 			}
 
-			$attrs_json = wp_json_encode( $img_attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+			$attrs_json = wp_json_encode( $img_attrs, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE );
 
 			$blocks[] = "<!-- wp:image {$attrs_json} -->\n"
 				. '<figure class="wp-block-image"><img src="" alt="" class="wp-image-' . $image_id . '"/></figure>' . "\n"
 				. '<!-- /wp:image -->';
 		}
 
-		return implode( "\n\n", $blocks );
+		return \implode( "\n\n", $blocks );
 	}
 }
