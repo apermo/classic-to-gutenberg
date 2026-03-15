@@ -47,7 +47,7 @@ class BlockConverterFactory {
 	 */
 	public function register( BlockConverterInterface $converter ): void {
 		foreach ( $converter->get_supported_tags() as $tag ) {
-			$this->converters[ strtolower( $tag ) ] = $converter;
+			$this->converters[ \strtolower( $tag ) ] = $converter;
 		}
 	}
 
@@ -60,7 +60,7 @@ class BlockConverterFactory {
 	 * @return BlockConverterInterface
 	 */
 	public function get_converter( string $tag_name, string $html ): BlockConverterInterface {
-		$tag = strtolower( $tag_name );
+		$tag = \strtolower( $tag_name );
 
 		if ( isset( $this->converters[ $tag ] ) && $this->converters[ $tag ]->can_convert( $tag, $html ) ) {
 			return $this->converters[ $tag ];

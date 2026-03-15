@@ -24,8 +24,8 @@ class QuoteConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	public function convert( string $html ): string {
-		preg_match( '/<blockquote(?:\s[^>]*)?>(.*)<\/blockquote>/s', $html, $match );
-		$inner = trim( $match[1] );
+		\preg_match( '/<blockquote(?:\s[^>]*)?>(.*)<\/blockquote>/s', $html, $match );
+		$inner = \trim( $match[1] );
 
 		$converted_inner = $this->convert_inner_content( $inner );
 		$content         = '<blockquote class="wp-block-quote">' . $converted_inner . '</blockquote>';
@@ -44,11 +44,11 @@ class QuoteConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function convert_inner_content( string $inner ): string {
-		$parts = preg_split(
+		$parts = \preg_split(
 			'/(<p(?:\s[^>]*)?>.*?<\/p>|<cite>.*?<\/cite>)/s',
 			$inner,
 			-1,
-			PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY,
+			\PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY,
 		);
 
 		if ( $parts === false ) {
@@ -59,7 +59,7 @@ class QuoteConverter extends AbstractBlockConverter {
 		$prev_was_paragraph = false;
 
 		foreach ( $parts as $part ) {
-			$part = trim( $part );
+			$part = \trim( $part );
 			if ( $part === '' ) {
 				continue;
 			}
@@ -67,7 +67,7 @@ class QuoteConverter extends AbstractBlockConverter {
 			if ( $this->is_cite_paragraph( $part ) ) {
 				$result .= $this->extract_cite( $part );
 				$prev_was_paragraph = false;
-			} elseif ( preg_match( '/^<p(?:\s[^>]*)?>.*<\/p>$/s', $part ) ) {
+			} elseif ( \preg_match( '/^<p(?:\s[^>]*)?>.*<\/p>$/s', $part ) ) {
 				if ( $prev_was_paragraph ) {
 					$result .= "\n\n";
 				}
@@ -92,7 +92,7 @@ class QuoteConverter extends AbstractBlockConverter {
 	 * @return bool
 	 */
 	private function is_cite_paragraph( string $part ): bool {
-		return (bool) preg_match( '/^<p(?:\s[^>]*)?>\s*<cite>.*?<\/cite>\s*<\/p>$/s', $part );
+		return (bool) \preg_match( '/^<p(?:\s[^>]*)?>\s*<cite>.*?<\/cite>\s*<\/p>$/s', $part );
 	}
 
 	/**
@@ -103,7 +103,7 @@ class QuoteConverter extends AbstractBlockConverter {
 	 * @return string The bare <cite>...</cite> element.
 	 */
 	private function extract_cite( string $part ): string {
-		if ( preg_match( '/<cite>.*?<\/cite>/s', $part, $match ) ) {
+		if ( \preg_match( '/<cite>.*?<\/cite>/s', $part, $match ) ) {
 			return $match[0];
 		}
 		return $part;

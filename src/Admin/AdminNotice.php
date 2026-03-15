@@ -13,7 +13,7 @@ class AdminNotice {
 	 * Create a new admin notice handler.
 	 */
 	public function __construct() {
-		add_action( 'admin_notices', [ $this, 'display_notices' ] );
+		\add_action( 'admin_notices', [ $this, 'display_notices' ] );
 	}
 
 	/**
@@ -22,29 +22,29 @@ class AdminNotice {
 	 * @return void
 	 */
 	public function display_notices(): void {
-		$user_id = get_current_user_id();
-		$notice  = get_transient( 'ctg_notice_' . $user_id );
+		$user_id = \get_current_user_id();
+		$notice  = \get_transient( 'ctg_notice_' . $user_id );
 
 		if ( $notice === false ) {
 			return;
 		}
 
-		delete_transient( 'ctg_notice_' . $user_id );
+		\delete_transient( 'ctg_notice_' . $user_id );
 
 		if ( $notice === 'converted' ) {
-			printf(
+			\printf(
 				'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
-				esc_html__( 'Post successfully converted to blocks.', 'classic-to-gutenberg' ),
+				\esc_html__( 'Post successfully converted to blocks.', 'classic-to-gutenberg' ),
 			);
 			return;
 		}
 
-		if ( str_starts_with( (string) $notice, 'error:' ) ) {
-			$error_message = substr( (string) $notice, 6 );
-			printf(
+		if ( \str_starts_with( (string) $notice, 'error:' ) ) {
+			$error_message = \substr( (string) $notice, 6 );
+			\printf(
 				'<div class="notice notice-error is-dismissible"><p>%s %s</p></div>',
-				esc_html__( 'Conversion failed:', 'classic-to-gutenberg' ),
-				esc_html( $error_message ),
+				\esc_html__( 'Conversion failed:', 'classic-to-gutenberg' ),
+				\esc_html( $error_message ),
 			);
 		}
 	}

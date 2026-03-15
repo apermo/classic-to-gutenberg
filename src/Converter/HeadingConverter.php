@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Converter;
 
+use WP_HTML_Tag_Processor;
+
 /**
  * Converts <h1>-<h6> tags to core/heading blocks.
  */
@@ -24,11 +26,11 @@ class HeadingConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	public function convert( string $html ): string {
-		preg_match( '/<(h([1-6]))/i', $html, $match );
-		$tag_name = strtolower( $match[1] );
+		\preg_match( '/<(h([1-6]))/i', $html, $match );
+		$tag_name = \strtolower( $match[1] );
 		$level    = (int) $match[2];
 
-		$processor = new \WP_HTML_Tag_Processor( $html );
+		$processor = new WP_HTML_Tag_Processor( $html );
 		if ( $processor->next_tag( [ 'tag_name' => $tag_name ] ) ) {
 			$existing = $processor->get_attribute( 'class' );
 			$classes  = $existing !== null ? $existing . ' wp-block-heading' : 'wp-block-heading';

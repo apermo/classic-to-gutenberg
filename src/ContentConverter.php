@@ -65,7 +65,7 @@ class ContentConverter {
 		 *
 		 * @return string
 		 */
-		$content = apply_filters( 'classic_to_gutenberg_pre_convert', $content );
+		$content = \apply_filters( 'classic_to_gutenberg_pre_convert', $content );
 
 		$placeholders = [];
 		$content      = $this->extract_special_comments( $content, $placeholders );
@@ -83,7 +83,7 @@ class ContentConverter {
 			$blocks[]  = $converter->convert( $element->html );
 		}
 
-		$result = implode( "\n\n", $blocks );
+		$result = \implode( "\n\n", $blocks );
 
 		/**
 		 * Filter content after the conversion pipeline.
@@ -94,7 +94,7 @@ class ContentConverter {
 		 *
 		 * @return string
 		 */
-		return apply_filters( 'classic_to_gutenberg_post_convert', $result );
+		return \apply_filters( 'classic_to_gutenberg_post_convert', $result );
 	}
 
 	/**
@@ -108,12 +108,12 @@ class ContentConverter {
 	private function extract_special_comments( string $content, array &$placeholders ): string {
 		$index = 0;
 
-		return (string) preg_replace_callback(
+		return (string) \preg_replace_callback(
 			'/<!--(more|nextpage)-->/',
 			static function ( array $matches ) use ( &$placeholders, &$index ): string {
 				$key                  = '%%CTG_PLACEHOLDER_' . $index . '%%';
 				$placeholders[ $key ] = $matches[0];
-				++$index;
+				$index++;
 				return $key;
 			},
 			$content,
@@ -130,7 +130,7 @@ class ContentConverter {
 	 */
 	private function restore_special_comments( string $content, array $placeholders ): string {
 		foreach ( $placeholders as $key => $original ) {
-			$content = str_replace(
+			$content = \str_replace(
 				[ '<p>' . $key . '</p>', $key ],
 				[ $original, $original ],
 				$content,
@@ -185,13 +185,13 @@ class ContentConverter {
 	 * @return TopLevelElement|null Re-tagged shortcode element, or null.
 	 */
 	private function try_retag_shortcode( TopLevelElement $element ): ?TopLevelElement {
-		$inner = trim( strip_tags( $element->html, '<img><a>' ) );
+		$inner = \trim( \strip_tags( $element->html, '<img><a>' ) );
 
-		if ( ! preg_match( '/^\[(\w[\w-]*)/', $inner ) ) {
+		if ( ! \preg_match( '/^\[(\w[\w-]*)/', $inner ) ) {
 			return null;
 		}
 
-		if ( ! preg_match( '/\[(\w[\w-]*)(?:\s[^\]]*)?\](?:.*?\[\/\1\])?/s', $element->html, $match ) ) {
+		if ( ! \preg_match( '/\[(\w[\w-]*)(?:\s[^\]]*)?\](?:.*?\[\/\1\])?/s', $element->html, $match ) ) {
 			return null;
 		}
 
@@ -206,19 +206,19 @@ class ContentConverter {
 	 * @return TopLevelElement|null Re-tagged image element, or null.
 	 */
 	private function try_retag_image( TopLevelElement $element ): ?TopLevelElement {
-		if ( ! preg_match( '/^<p[^>]*>\s*(?:<a\s[^>]*>)?\s*<img\s/', $element->html ) ) {
+		if ( ! \preg_match( '/^<p[^>]*>\s*(?:<a\s[^>]*>)?\s*<img\s/', $element->html ) ) {
 			return null;
 		}
 
-		$stripped = (string) preg_replace( '/<\/a>/', '', $element->html );
-		if ( preg_match( '/[^<>]\s*<\/p>/', $stripped ) ) {
+		$stripped = (string) \preg_replace( '/<\/a>/', '', $element->html );
+		if ( \preg_match( '/[^<>]\s*<\/p>/', $stripped ) ) {
 			return null;
 		}
 
-		if ( ! preg_match( '/(?:<a\s[^>]*>)?\s*<img\s[^>]*\/?>\s*(?:<\/a>)?/i', $element->html, $match ) ) {
+		if ( ! \preg_match( '/(?:<a\s[^>]*>)?\s*<img\s[^>]*\/?>\s*(?:<\/a>)?/i', $element->html, $match ) ) {
 			return null;
 		}
 
-		return new TopLevelElement( 'img', trim( $match[0] ) );
+		return new TopLevelElement( 'img', \trim( $match[0] ) );
 	}
 }

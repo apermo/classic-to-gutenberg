@@ -17,7 +17,7 @@ class ExampleIntegrationTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_wordpress_is_loaded(): void {
-		$this->assertTrue( function_exists( 'do_action' ) );
+		$this->assertTrue( \function_exists( 'do_action' ) );
 	}
 
 	/**
@@ -26,16 +26,16 @@ class ExampleIntegrationTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_project_is_active(): void {
-		$plugin_file = dirname( __DIR__, 2 ) . '/plugin.php';
+		$plugin_file = \dirname( __DIR__, 2 ) . '/plugin.php';
 
-		if ( file_exists( $plugin_file ) ) {
+		if ( \file_exists( $plugin_file ) ) {
 			$this->assertTrue(
-				defined( 'CLASSIC_TO_GUTENBERG_VERSION' ),
+				\defined( 'CLASSIC_TO_GUTENBERG_VERSION' ),
 				'Plugin constant CLASSIC_TO_GUTENBERG_VERSION should be defined.',
 			);
 		} else {
 			$this->assertNotFalse(
-				wp_get_theme()->get( 'Name' ),
+				\wp_get_theme()->get( 'Name' ),
 				'Active theme should have a name.',
 			);
 		}

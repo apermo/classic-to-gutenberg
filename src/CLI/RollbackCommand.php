@@ -45,9 +45,9 @@ class RollbackCommand {
 		$result   = $rollback->rollback( $post_id );
 
 		if ( $result->success ) {
-			WP_CLI::success( sprintf( 'Post #%d rolled back successfully.', $post_id ) );
+			WP_CLI::success( \sprintf( 'Post #%d rolled back successfully.', $post_id ) );
 		} else {
-			WP_CLI::error( sprintf( 'Rollback failed for post #%d: %s', $post_id, $result->error ) );
+			WP_CLI::error( \sprintf( 'Rollback failed for post #%d: %s', $post_id, $result->error ) );
 		}
 	}
 }

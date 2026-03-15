@@ -21,6 +21,7 @@ use Apermo\ClassicToGutenberg\Converter\Shortcode\GalleryHandler;
 use Apermo\ClassicToGutenberg\Converter\ShortcodeConverter;
 use Apermo\ClassicToGutenberg\Converter\TableConverter;
 use Apermo\ClassicToGutenberg\Parser\TopLevelSplitter;
+use Generator;
 use WP_UnitTestCase;
 
 /**
@@ -42,29 +43,29 @@ class ContentConverterTest extends WP_UnitTestCase {
 	 *
 	 * @return \Generator<string, array{string, string}>
 	 */
-	public static function fixture_provider(): \Generator {
-		$fixtures_dir = dirname( __DIR__ ) . '/fixtures';
-		$inputs       = glob( $fixtures_dir . '/*.html' );
+	public static function fixture_provider(): Generator {
+		$fixtures_dir = \dirname( __DIR__ ) . '/fixtures';
+		$inputs       = \glob( $fixtures_dir . '/*.html' );
 
 		if ( $inputs === false ) {
 			return;
 		}
 
 		foreach ( $inputs as $input_file ) {
-			$basename = basename( $input_file, '.html' );
-			if ( str_ends_with( $basename, '.expected' ) ) {
+			$basename = \basename( $input_file, '.html' );
+			if ( \str_ends_with( $basename, '.expected' ) ) {
 				continue;
 			}
 
 			$expected_file = $fixtures_dir . '/' . $basename . '.expected.html';
-			if ( ! file_exists( $expected_file ) ) {
+			if ( ! \file_exists( $expected_file ) ) {
 				continue;
 			}
 
 			// phpcs:disable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local fixtures
 			yield $basename => [
-				(string) file_get_contents( $input_file ),
-				trim( (string) file_get_contents( $expected_file ) ),
+				(string) \file_get_contents( $input_file ),
+				\trim( (string) \file_get_contents( $expected_file ) ),
 			];
 			// phpcs:enable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		}
@@ -101,7 +102,7 @@ class ContentConverterTest extends WP_UnitTestCase {
 		$this->converter = new ContentConverter(
 			$factory,
 			new TopLevelSplitter(),
-			static fn( string $content ): string => wpautop( $content ),
+			static fn( string $content ): string => \wpautop( $content ),
 		);
 	}
 

@@ -28,10 +28,10 @@ class RowAction {
 	public function __construct( ContentConverter $converter ) {
 		$this->converter = $converter;
 
-		add_filter( 'post_row_actions', [ $this, 'add_row_actions' ], 10, 2 );
-		add_filter( 'page_row_actions', [ $this, 'add_row_actions' ], 10, 2 );
-		add_action( 'admin_post_ctg_convert', [ $this, 'handle_convert' ] );
-		add_action( 'admin_post_ctg_preview', [ $this, 'handle_preview' ] );
+		\add_filter( 'post_row_actions', [ $this, 'add_row_actions' ], 10, 2 );
+		\add_filter( 'page_row_actions', [ $this, 'add_row_actions' ], 10, 2 );
+		\add_action( 'admin_post_ctg_convert', [ $this, 'handle_convert' ] );
+		\add_action( 'admin_post_ctg_preview', [ $this, 'handle_preview' ] );
 	}
 
 	/**
@@ -47,30 +47,30 @@ class RowAction {
 			return $actions;
 		}
 
-		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+		if ( ! \current_user_can( 'edit_post', $post->ID ) ) {
 			return $actions;
 		}
 
-		$convert_url = wp_nonce_url(
-			admin_url( 'admin-post.php?action=ctg_convert&post_id=' . $post->ID ),
+		$convert_url = \wp_nonce_url(
+			\admin_url( 'admin-post.php?action=ctg_convert&post_id=' . $post->ID ),
 			'ctg_convert_' . $post->ID,
 		);
 
-		$preview_url = wp_nonce_url(
-			admin_url( 'admin-post.php?action=ctg_preview&post_id=' . $post->ID ),
+		$preview_url = \wp_nonce_url(
+			\admin_url( 'admin-post.php?action=ctg_preview&post_id=' . $post->ID ),
 			'ctg_preview_' . $post->ID,
 		);
 
-		$actions['ctg_convert'] = sprintf(
+		$actions['ctg_convert'] = \sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( $convert_url ),
-			esc_html__( 'Convert to Blocks', 'classic-to-gutenberg' ),
+			\esc_url( $convert_url ),
+			\esc_html__( 'Convert to Blocks', 'classic-to-gutenberg' ),
 		);
 
-		$actions['ctg_preview'] = sprintf(
+		$actions['ctg_preview'] = \sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( $preview_url ),
-			esc_html__( 'Preview Blocks', 'classic-to-gutenberg' ),
+			\esc_url( $preview_url ),
+			\esc_html__( 'Preview Blocks', 'classic-to-gutenberg' ),
 		);
 
 		return $actions;
@@ -82,30 +82,30 @@ class RowAction {
 	 * @return void
 	 */
 	public function handle_convert(): void {
-		$post_id = isset( $_GET['post_id'] ) ? absint( wp_unslash( $_GET['post_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce checked below
+		$post_id = isset( $_GET['post_id'] ) ? \absint( \wp_unslash( $_GET['post_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce checked below
 
-		check_admin_referer( 'ctg_convert_' . $post_id );
+		\check_admin_referer( 'ctg_convert_' . $post_id );
 
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_die( esc_html__( 'You do not have permission to convert this post.', 'classic-to-gutenberg' ) );
+		if ( ! \current_user_can( 'edit_post', $post_id ) ) {
+			\wp_die( \esc_html__( 'You do not have permission to convert this post.', 'classic-to-gutenberg' ) );
 		}
 
 		$runner = new MigrationRunner( $this->converter );
 		$result = $runner->convert_post( $post_id );
 
-		$redirect = admin_url( 'edit.php' );
-		$post     = get_post( $post_id );
+		$redirect = \admin_url( 'edit.php' );
+		$post     = \get_post( $post_id );
 		if ( $post !== null ) {
-			$redirect = admin_url( 'edit.php?post_type=' . $post->post_type );
+			$redirect = \admin_url( 'edit.php?post_type=' . $post->post_type );
 		}
 
 		if ( $result->success ) {
-			set_transient( 'ctg_notice_' . get_current_user_id(), 'converted', 30 );
+			\set_transient( 'ctg_notice_' . \get_current_user_id(), 'converted', 30 );
 		} else {
-			set_transient( 'ctg_notice_' . get_current_user_id(), 'error:' . $result->error, 30 );
+			\set_transient( 'ctg_notice_' . \get_current_user_id(), 'error:' . $result->error, 30 );
 		}
 
-		wp_safe_redirect( $redirect );
+		\wp_safe_redirect( $redirect );
 		exit();
 	}
 
@@ -115,26 +115,26 @@ class RowAction {
 	 * @return void
 	 */
 	public function handle_preview(): void {
-		$post_id = isset( $_GET['post_id'] ) ? absint( wp_unslash( $_GET['post_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce checked below
+		$post_id = isset( $_GET['post_id'] ) ? \absint( \wp_unslash( $_GET['post_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce checked below
 
-		check_admin_referer( 'ctg_preview_' . $post_id );
+		\check_admin_referer( 'ctg_preview_' . $post_id );
 
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_die( esc_html__( 'You do not have permission to preview this post.', 'classic-to-gutenberg' ) );
+		if ( ! \current_user_can( 'edit_post', $post_id ) ) {
+			\wp_die( \esc_html__( 'You do not have permission to preview this post.', 'classic-to-gutenberg' ) );
 		}
 
 		$runner = new MigrationRunner( $this->converter );
 		$result = $runner->convert_post( $post_id, true );
 
 		if ( ! $result->success ) {
-			wp_die( esc_html( $result->error ) );
+			\wp_die( \esc_html( $result->error ) );
 		}
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- block markup preview
-		echo '<html><head><title>Block Preview — Post #' . esc_html( (string) $post_id ) . '</title></head><body>';
-		echo '<h1>' . esc_html__( 'Block Preview', 'classic-to-gutenberg' ) . '</h1>';
+		echo '<html><head><title>Block Preview — Post #' . \esc_html( (string) $post_id ) . '</title></head><body>';
+		echo '<h1>' . \esc_html__( 'Block Preview', 'classic-to-gutenberg' ) . '</h1>';
 		echo '<pre style="white-space: pre-wrap; word-wrap: break-word;">';
-		echo esc_html( $result->converted );
+		echo \esc_html( $result->converted );
 		echo '</pre></body></html>';
 		exit();
 	}
@@ -147,6 +147,6 @@ class RowAction {
 	 * @return bool
 	 */
 	private function has_blocks( WP_Post $post ): bool {
-		return str_contains( $post->post_content, '<!-- wp:' );
+		return \str_contains( $post->post_content, '<!-- wp:' );
 	}
 }

@@ -32,8 +32,8 @@ class Plugin {
 	 * @return void
 	 */
 	public static function init(): void {
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			add_action(
+		if ( \defined( 'WP_CLI' ) && \WP_CLI ) {
+			\add_action(
 				'cli_init',
 				static function (): void {
 					$converter = self::create_content_converter();
@@ -44,7 +44,7 @@ class Plugin {
 			);
 		}
 
-		add_action(
+		\add_action(
 			'admin_init',
 			static function (): void {
 				$converter = self::create_content_converter();
@@ -85,7 +85,7 @@ class Plugin {
 		 *
 		 * @return \Apermo\ClassicToGutenberg\Converter\Shortcode\ShortcodeHandlerInterface[]
 		 */
-		$shortcode_handlers = apply_filters(
+		$shortcode_handlers = \apply_filters(
 			'classic_to_gutenberg_shortcode_handlers',
 			[
 				new CaptionHandler(),
@@ -103,7 +103,7 @@ class Plugin {
 		 *
 		 * @return BlockConverterFactory
 		 */
-		apply_filters( 'classic_to_gutenberg_converters', $factory );
+		\apply_filters( 'classic_to_gutenberg_converters', $factory );
 
 		return $factory;
 	}
@@ -117,7 +117,7 @@ class Plugin {
 		return new ContentConverter(
 			self::create_factory(),
 			new TopLevelSplitter(),
-			static fn( string $content ): string => wpautop( $content ),
+			static fn( string $content ): string => \wpautop( $content ),
 		);
 	}
 }

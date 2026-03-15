@@ -36,7 +36,7 @@ class MigrationRunner {
 	 * @return MigrationResult
 	 */
 	public function convert_post( int $post_id, bool $dry_run = false ): MigrationResult {
-		$post = get_post( $post_id );
+		$post = \get_post( $post_id );
 
 		if ( $post === null ) {
 			return new MigrationResult( $post_id, false, '', '', 'Post not found.' );
@@ -50,9 +50,9 @@ class MigrationRunner {
 		}
 
 		// Save a revision with the classic content before converting.
-		$revision_id = wp_save_post_revision( $post_id );
+		$revision_id = \wp_save_post_revision( $post_id );
 
-		$updated = wp_update_post(
+		$updated = \wp_update_post(
 			[
 				'ID'           => $post_id,
 				'post_content' => $converted,
@@ -60,13 +60,13 @@ class MigrationRunner {
 			true,
 		);
 
-		if ( is_wp_error( $updated ) ) {
+		if ( \is_wp_error( $updated ) ) {
 			return new MigrationResult( $post_id, false, $original, $converted, $updated->get_error_message() );
 		}
 
 		// Store the pre-conversion revision ID for rollback.
-		if ( is_int( $revision_id ) && $revision_id > 0 ) {
-			update_post_meta( $post_id, '_ctg_revision_id', $revision_id );
+		if ( \is_int( $revision_id ) && $revision_id > 0 ) {
+			\update_post_meta( $post_id, '_ctg_revision_id', $revision_id );
 		}
 
 		/**
@@ -77,7 +77,7 @@ class MigrationRunner {
 		 * @param int             $post_id The post ID.
 		 * @param MigrationResult $result  The migration result.
 		 */
-		do_action( 'classic_to_gutenberg_post_converted', $post_id, new MigrationResult( $post_id, true, $original, $converted ) );
+		\do_action( 'classic_to_gutenberg_post_converted', $post_id, new MigrationResult( $post_id, true, $original, $converted ) );
 
 		return new MigrationResult( $post_id, true, $original, $converted );
 	}
@@ -99,7 +99,7 @@ class MigrationRunner {
 		 * @param int[] $post_ids The post IDs.
 		 * @param bool  $dry_run  Whether this is a dry run.
 		 */
-		do_action( 'classic_to_gutenberg_batch_started', $post_ids, $dry_run );
+		\do_action( 'classic_to_gutenberg_batch_started', $post_ids, $dry_run );
 
 		$results = [];
 		foreach ( $post_ids as $post_id ) {
@@ -114,7 +114,7 @@ class MigrationRunner {
 		 * @param MigrationResult[] $results The migration results.
 		 * @param bool              $dry_run Whether this was a dry run.
 		 */
-		do_action( 'classic_to_gutenberg_batch_completed', $results, $dry_run );
+		\do_action( 'classic_to_gutenberg_batch_completed', $results, $dry_run );
 
 		return $results;
 	}
