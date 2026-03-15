@@ -13,9 +13,13 @@ Batch migration of WordPress classic editor content to Gutenberg blocks.
 
 ## Installation
 
+This plugin uses Composer for autoloading. You must run `composer install` before activating:
+
 ```bash
 composer install
 ```
+
+If dependencies are missing, the plugin displays an admin notice and does not load.
 
 ## Usage
 

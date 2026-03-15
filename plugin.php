@@ -21,6 +21,27 @@ namespace Apermo\ClassicToGutenberg;
 \define( 'CLASSIC_TO_GUTENBERG_FILE', __FILE__ );
 \define( 'CLASSIC_TO_GUTENBERG_DIR', plugin_dir_path( __FILE__ ) );
 
+if ( ! \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	add_action( 'admin_notices', 'Apermo\ClassicToGutenberg\ctg_missing_autoloader_notice' );
+	return;
+}
+
+/**
+ * Display admin notice when Composer autoloader is missing.
+ *
+ * @return void
+ */
+function ctg_missing_autoloader_notice(): void {
+	\printf(
+		'<div class="notice notice-error"><p>%s</p></div>',
+		\sprintf(
+			/* translators: %s: composer install command */
+			esc_html__( 'Please run %s to install the required dependencies.', 'classic-to-gutenberg' ),
+			'<code>composer install</code>',
+		),
+	);
+}
+
 require_once __DIR__ . '/vendor/autoload.php';
 
 Plugin::init();
