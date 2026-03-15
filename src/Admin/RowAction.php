@@ -44,9 +44,26 @@ class RowAction {
 	public function register_bulk_actions(): void {
 		foreach ( get_post_types( [ 'public' => true ] ) as $post_type ) {
 			$screen = 'edit-' . $post_type;
-			add_filter( 'bulk_actions-' . $screen, [ $this, 'add_bulk_action' ] );
+			add_filter( 'bulk_actions-' . $screen, [ $this, 'add_bulk_action' ], 5 );
 			add_filter( 'handle_bulk_actions-' . $screen, [ $this, 'handle_bulk_convert' ], 10, 3 );
 		}
+
+		add_action( 'admin_footer', [ $this, 'disable_bulk_header' ] );
+	}
+
+	/**
+	 * Disable the bulk action header option via inline script.
+	 *
+	 * @return void
+	 */
+	public function disable_bulk_header(): void {
+		$screen = get_current_screen();
+		if ( $screen === null || $screen->base !== 'edit' ) {
+			return;
+		}
+		?>
+		<script>document.querySelectorAll('option[value="ctg_header"]').forEach(function(o){o.disabled=true});</script>
+		<?php
 	}
 
 	/**
@@ -147,6 +164,7 @@ class RowAction {
 	 * @return string[]
 	 */
 	public function add_bulk_action( array $actions ): array {
+		$actions['ctg_header']       = '↓ ' . __( 'Classic to Gutenberg', 'classic-to-gutenberg' );
 		$actions['ctg_bulk_convert'] = __( 'Convert to Blocks', 'classic-to-gutenberg' );
 		return $actions;
 	}
