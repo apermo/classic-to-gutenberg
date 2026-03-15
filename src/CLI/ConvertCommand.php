@@ -98,17 +98,17 @@ class ConvertCommand {
 			return [];
 		}
 
-		$ids = [];
-		foreach ( $args as $arg ) {
-			foreach ( explode( ',', $arg ) as $part ) {
+		$post_ids = [];
+		foreach ( $args as $value ) {
+			foreach ( explode( ',', $value ) as $part ) {
 				$part = trim( $part );
 				if ( $part !== '' && ctype_digit( $part ) ) {
-					$ids[] = (int) $part;
+					$post_ids[] = (int) $part;
 				}
 			}
 		}
 
-		return $ids;
+		return $post_ids;
 	}
 
 	/**
