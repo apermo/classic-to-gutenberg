@@ -49,6 +49,9 @@ class MigrationRunner {
 			return new MigrationResult( $post_id, true, $original, $converted );
 		}
 
+		// Save a revision with the classic content before converting.
+		$revision_id = wp_save_post_revision( $post_id );
+
 		$updated = wp_update_post(
 			[
 				'ID'           => $post_id,
@@ -61,11 +64,9 @@ class MigrationRunner {
 			return new MigrationResult( $post_id, false, $original, $converted, $updated->get_error_message() );
 		}
 
-		// Store the revision ID for potential rollback.
-		$revisions = wp_get_post_revisions( $post_id, [ 'numberposts' => 1 ] );
-		if ( $revisions !== [] ) {
-			$revision = reset( $revisions );
-			update_post_meta( $post_id, '_ctg_revision_id', $revision->ID );
+		// Store the pre-conversion revision ID for rollback.
+		if ( is_int( $revision_id ) && $revision_id > 0 ) {
+			update_post_meta( $post_id, '_ctg_revision_id', $revision_id );
 		}
 
 		/**
