@@ -32,8 +32,10 @@ if ( ! \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
  * @return void
  */
 function ctg_missing_autoloader_notice(): void {
+	$plugin_data = get_plugin_data( __FILE__ );
 	\printf(
-		'<div class="notice notice-error"><p>%s</p></div>',
+		'<div class="notice notice-error"><p><strong>%s:</strong> %s</p></div>',
+		esc_html( $plugin_data['Name'] ),
 		\sprintf(
 			/* translators: %s: composer install command */
 			esc_html__( 'Please run %s to install the required dependencies.', 'classic-to-gutenberg' ),
