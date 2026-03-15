@@ -36,6 +36,8 @@ class Plugin {
 		 * Allows registration of additional block converters.
 		 *
 		 * @param BlockConverterFactory $factory The converter factory.
+		 *
+		 * @return BlockConverterFactory
 		 */
 		apply_filters( 'classic_to_gutenberg_converters', $factory );
 

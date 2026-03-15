@@ -28,6 +28,8 @@ class BlockConverterFactory {
 	private BlockConverterInterface $fallback;
 
 	/**
+	 * Create a new factory with a fallback converter.
+	 *
 	 * @param BlockConverterInterface $fallback Converter used when no match is found.
 	 */
 	public function __construct( BlockConverterInterface $fallback ) {

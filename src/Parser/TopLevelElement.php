@@ -10,6 +10,8 @@ namespace Apermo\ClassicToGutenberg\Parser;
 readonly class TopLevelElement {
 
 	/**
+	 * Create a new top-level element.
+	 *
 	 * @param string $tag_name Lowercase tag name or pseudo-tag (__more__, __nextpage__, __shortcode__, __text__).
 	 * @param string $html     The outer HTML of this element.
 	 */

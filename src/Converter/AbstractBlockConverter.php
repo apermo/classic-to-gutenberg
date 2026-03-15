@@ -10,7 +10,12 @@ namespace Apermo\ClassicToGutenberg\Converter;
 abstract class AbstractBlockConverter implements BlockConverterInterface {
 
 	/**
-	 * {@inheritDoc}
+	 * Check whether this converter supports the given tag.
+	 *
+	 * @param string $tag_name The lowercase tag name.
+	 * @param string $html     The outer HTML of the element.
+	 *
+	 * @return bool
 	 */
 	public function can_convert( string $tag_name, string $html ): bool {
 		return in_array( $tag_name, $this->get_supported_tags(), true );

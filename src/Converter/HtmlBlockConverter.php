@@ -17,14 +17,23 @@ class HtmlBlockConverter extends AbstractBlockConverter {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Always reports it can convert (fallback converter).
+	 *
+	 * @param string $tag_name The lowercase tag name.
+	 * @param string $html     The outer HTML of the element.
+	 *
+	 * @return bool
 	 */
 	public function can_convert( string $tag_name, string $html ): bool {
 		return true;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Wrap content in a core/html block.
+	 *
+	 * @param string $html The HTML content.
+	 *
+	 * @return string
 	 */
 	public function convert( string $html ): string {
 		return $this->wrap_block( 'html', $html );

@@ -51,69 +51,123 @@ class TopLevelSplitter {
 
 		$elements = [];
 		$length   = strlen( $html );
-		$pos      = 0;
+		$offset   = 0;
 
-		while ( $pos < $length ) {
-			// Skip whitespace between elements.
-			if ( preg_match( '/\G\s+/', $html, $m, 0, $pos ) ) {
-				$pos += strlen( $m[0] );
-				if ( $pos >= $length ) {
-					break;
-				}
+		while ( $offset < $length ) {
+			$offset = $this->skip_whitespace( $html, $offset );
+			if ( $offset >= $length ) {
+				break;
 			}
 
-			// Match <!--more--> / <!--nextpage-->.
-			if ( preg_match( '/\G<!--more-->/i', $html, $m, 0, $pos ) ) {
-				$elements[] = new TopLevelElement( '__more__', $m[0] );
-				$pos       += strlen( $m[0] );
-				continue;
+			$element = $this->match_comment( $html, $offset )
+				?? $this->match_shortcode( $html, $offset )
+				?? $this->match_block_tag( $html, $offset )
+				?? $this->match_text( $html, $offset );
+
+			if ( $element !== null ) {
+				$elements[] = $element;
+				$offset     += strlen( $element->html );
+			} else {
+				++$offset;
 			}
-
-			if ( preg_match( '/\G<!--nextpage-->/i', $html, $m, 0, $pos ) ) {
-				$elements[] = new TopLevelElement( '__nextpage__', $m[0] );
-				$pos       += strlen( $m[0] );
-				continue;
-			}
-
-			// Match shortcode pattern at top level.
-			if ( preg_match( '/\G\[(\w[\w-]*)(?:\s[^\]]*)?\](?:.*?\[\/\1\])?/s', $html, $m, 0, $pos ) ) {
-				$elements[] = new TopLevelElement( '__shortcode__', $m[0] );
-				$pos       += strlen( $m[0] );
-				continue;
-			}
-
-			// Match opening block-level tag.
-			$block_tags_pattern = implode( '|', self::BLOCK_TAGS );
-			if ( preg_match( '/\G<(' . $block_tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)/i', $html, $m, 0, $pos ) ) {
-				$tag_name = strtolower( $m[1] );
-
-				// Void tags: emit immediately.
-				if ( in_array( $tag_name, self::VOID_TAGS, true ) ) {
-					$elements[] = new TopLevelElement( $tag_name, $m[0] );
-					$pos       += strlen( $m[0] );
-					continue;
-				}
-
-				// Find matching close tag with nesting depth tracking.
-				$element_html = $this->extract_element( $html, $pos, $tag_name );
-				$elements[]   = new TopLevelElement( $tag_name, $element_html );
-				$pos         += strlen( $element_html );
-				continue;
-			}
-
-			// Anything else: accumulate as __text__ until next block-level element, comment, or shortcode.
-			$text = $this->extract_text( $html, $pos );
-			if ( $text !== '' ) {
-				$elements[] = new TopLevelElement( '__text__', $text );
-				$pos       += strlen( $text );
-				continue;
-			}
-
-			// Safety: advance by one character to avoid infinite loop.
-			$pos++;
 		}
 
 		return $elements;
+	}
+
+	/**
+	 * Skip whitespace characters starting at offset.
+	 *
+	 * @param string $html   Full HTML string.
+	 * @param int    $offset Current position.
+	 *
+	 * @return int New position after whitespace.
+	 */
+	private function skip_whitespace( string $html, int $offset ): int {
+		if ( preg_match( '/\G\s+/', $html, $match, 0, $offset ) ) {
+			return $offset + strlen( $match[0] );
+		}
+		return $offset;
+	}
+
+	/**
+	 * Try to match <!--more--> or <!--nextpage--> at offset.
+	 *
+	 * @param string $html   Full HTML string.
+	 * @param int    $offset Current position.
+	 *
+	 * @return TopLevelElement|null
+	 */
+	private function match_comment( string $html, int $offset ): ?TopLevelElement {
+		if ( preg_match( '/\G<!--more-->/i', $html, $match, 0, $offset ) ) {
+			return new TopLevelElement( '__more__', $match[0] );
+		}
+
+		if ( preg_match( '/\G<!--nextpage-->/i', $html, $match, 0, $offset ) ) {
+			return new TopLevelElement( '__nextpage__', $match[0] );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Try to match a shortcode pattern at offset.
+	 *
+	 * @param string $html   Full HTML string.
+	 * @param int    $offset Current position.
+	 *
+	 * @return TopLevelElement|null
+	 */
+	private function match_shortcode( string $html, int $offset ): ?TopLevelElement {
+		if ( preg_match( '/\G\[(\w[\w-]*)(?:\s[^\]]*)?\](?:.*?\[\/\1\])?/s', $html, $match, 0, $offset ) ) {
+			return new TopLevelElement( '__shortcode__', $match[0] );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Try to match an opening block-level tag at offset.
+	 *
+	 * @param string $html   Full HTML string.
+	 * @param int    $offset Current position.
+	 *
+	 * @return TopLevelElement|null
+	 */
+	private function match_block_tag( string $html, int $offset ): ?TopLevelElement {
+		$tags_pattern = implode( '|', self::BLOCK_TAGS );
+
+		if ( ! preg_match( '/\G<(' . $tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)/i', $html, $match, 0, $offset ) ) {
+			return null;
+		}
+
+		$tag_name = strtolower( $match[1] );
+
+		if ( in_array( $tag_name, self::VOID_TAGS, true ) ) {
+			return new TopLevelElement( $tag_name, $match[0] );
+		}
+
+		$element_html = $this->extract_element( $html, $offset, $tag_name );
+
+		return new TopLevelElement( $tag_name, $element_html );
+	}
+
+	/**
+	 * Try to match non-block text content at offset.
+	 *
+	 * @param string $html   Full HTML string.
+	 * @param int    $offset Current position.
+	 *
+	 * @return TopLevelElement|null
+	 */
+	private function match_text( string $html, int $offset ): ?TopLevelElement {
+		$text = $this->extract_text( $html, $offset );
+
+		if ( $text === '' ) {
+			return null;
+		}
+
+		return new TopLevelElement( '__text__', $text );
 	}
 
 	/**
@@ -128,111 +182,98 @@ class TopLevelSplitter {
 	}
 
 	/**
-	 * Extract a complete element from the HTML starting at $pos.
+	 * Extract a complete element from the HTML starting at given offset.
 	 *
 	 * Tracks nesting depth to find the correct closing tag.
 	 * Handles implicit <p> closing (a new <p> at depth 0 closes the previous <p>).
 	 *
 	 * @param string $html     Full HTML string.
-	 * @param int    $pos      Start position (at the opening tag).
+	 * @param int    $offset   Start position (at the opening tag).
 	 * @param string $tag_name Lowercase tag name.
 	 *
 	 * @return string The complete element HTML.
 	 */
-	private function extract_element( string $html, int $pos, string $tag_name ): string {
+	private function extract_element( string $html, int $offset, string $tag_name ): string {
 		$length = strlen( $html );
 
-		// Match the opening tag to advance past it.
-		preg_match( '/\G<' . $tag_name . '(?:\s[^>]*)?>/', $html, $open_match, 0, $pos );
-		$search_pos = $pos + strlen( $open_match[0] );
-
-		$depth         = 1;
-		$open_pattern  = '/<' . $tag_name . '(?:\s[^>]*)?>|<\/' . $tag_name . '\s*>/i';
-		$block_pattern = '/\G<(?:' . implode( '|', self::BLOCK_TAGS ) . ')(?:\s[^>]*)?(?:\/>|>)/i';
+		preg_match( '/\G<' . $tag_name . '(?:\s[^>]*)?>/', $html, $open_match, 0, $offset );
+		$search_pos   = $offset + strlen( $open_match[0] );
+		$depth        = 1;
+		$open_pattern = '/<' . $tag_name . '(?:\s[^>]*)?>|<\/' . $tag_name . '\s*>/i';
 
 		while ( $search_pos < $length && $depth > 0 ) {
-			if ( ! preg_match( $open_pattern, $html, $m, PREG_OFFSET_CAPTURE, $search_pos ) ) {
-				// No matching close tag found — broken markup.
-				// Take content until next block-level element at depth 0.
-				return $this->extract_until_next_block( $html, $pos );
+			if ( ! preg_match( $open_pattern, $html, $match, PREG_OFFSET_CAPTURE, $search_pos ) ) {
+				return $this->extract_until_next_block( $html, $offset );
 			}
 
-			$match_str    = $m[0][0];
-			$match_pos    = (int) $m[0][1];
-			$is_close_tag = str_starts_with( $match_str, '</' );
+			$match_str    = $match[0][0];
+			$match_offset = $match[0][1];
+			$is_closing   = str_starts_with( $match_str, '</' );
 
-			if ( $is_close_tag ) {
-				$depth--;
+			if ( $is_closing ) {
+				--$depth;
 			} else {
-				// For <p>, a new <p> at depth 1 implicitly closes the previous.
 				if ( $tag_name === 'p' && $depth === 1 ) {
-					// Implicit close: return content up to this new <p>.
-					return substr( $html, $pos, $match_pos - $pos );
+					return substr( $html, $offset, $match_offset - $offset );
 				}
-				$depth++;
+				++$depth;
 			}
 
-			$search_pos = $match_pos + strlen( $match_str );
+			$search_pos = $match_offset + strlen( $match_str );
 		}
 
 		if ( $depth > 0 ) {
-			// Unclosed element — take until next block-level element.
-			return $this->extract_until_next_block( $html, $pos );
+			return $this->extract_until_next_block( $html, $offset );
 		}
 
-		return substr( $html, $pos, $search_pos - $pos );
+		return substr( $html, $offset, $search_pos - $offset );
 	}
 
 	/**
-	 * Extract content from $pos until the next block-level element starts.
+	 * Extract content from offset until the next block-level element starts.
 	 *
 	 * Used for broken/unclosed elements.
 	 *
-	 * @param string $html Full HTML string.
-	 * @param int    $pos  Start position.
+	 * @param string $html   Full HTML string.
+	 * @param int    $offset Start position.
 	 *
 	 * @return string
 	 */
-	private function extract_until_next_block( string $html, int $pos ): string {
-		$block_tags_pattern = implode( '|', self::BLOCK_TAGS );
-		$pattern            = '/(?<=\n|\s)<(?:' . $block_tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)/i';
+	private function extract_until_next_block( string $html, int $offset ): string {
+		$tags_pattern = implode( '|', self::BLOCK_TAGS );
+		$pattern      = '/(?<=\n|\s)<(?:' . $tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)/i';
 
-		// Skip past the current opening tag before searching.
-		preg_match( '/\G<\w+(?:\s[^>]*)?>/', $html, $open_match, 0, $pos );
-		$after_open = $pos + strlen( $open_match[0] );
+		preg_match( '/\G<\w+(?:\s[^>]*)?>/', $html, $open_match, 0, $offset );
+		$after_open = $offset + strlen( $open_match[0] );
 
-		// Look for the next block-level element.
-		if ( preg_match( $pattern, $html, $m, PREG_OFFSET_CAPTURE, $after_open ) ) {
-			$next_block_pos = (int) $m[0][1];
-			$result         = substr( $html, $pos, $next_block_pos - $pos );
+		if ( preg_match( $pattern, $html, $match, PREG_OFFSET_CAPTURE, $after_open ) ) {
+			$result = substr( $html, $offset, $match[0][1] - $offset );
 			return rtrim( $result );
 		}
 
-		// No more block elements — take the rest.
-		return rtrim( substr( $html, $pos ) );
+		return rtrim( substr( $html, $offset ) );
 	}
 
 	/**
-	 * Extract non-block-level text content starting at $pos.
+	 * Extract non-block-level text content starting at offset.
 	 *
-	 * @param string $html Full HTML string.
-	 * @param int    $pos  Start position.
+	 * @param string $html   Full HTML string.
+	 * @param int    $offset Start position.
 	 *
 	 * @return string
 	 */
-	private function extract_text( string $html, int $pos ): string {
-		$block_tags_pattern = implode( '|', self::BLOCK_TAGS );
-		$stop_pattern       = '/<(?:' . $block_tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)|<!--(?:more|nextpage)-->|\[(\w[\w-]*)(?:\s[^\]]*)?]/i';
+	private function extract_text( string $html, int $offset ): string {
+		$tags_pattern = implode( '|', self::BLOCK_TAGS );
+		$stop_pattern = '/<(?:' . $tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)|<!--(?:more|nextpage)-->|\[(\w[\w-]*)(?:\s[^\]]*)?]/i';
 
-		if ( preg_match( $stop_pattern, $html, $m, PREG_OFFSET_CAPTURE, $pos ) ) {
-			$stop_pos = (int) $m[0][1];
-			if ( $stop_pos === $pos ) {
+		if ( preg_match( $stop_pattern, $html, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
+			$stop_offset = $match[0][1];
+			if ( $stop_offset === $offset ) {
 				return '';
 			}
-			return rtrim( substr( $html, $pos, $stop_pos - $pos ) );
+			return rtrim( substr( $html, $offset, $stop_offset - $offset ) );
 		}
 
-		// No more block elements — take the rest.
-		return rtrim( substr( $html, $pos ) );
+		return rtrim( substr( $html, $offset ) );
 	}
 }
