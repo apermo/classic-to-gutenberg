@@ -32,6 +32,21 @@ class RowAction {
 		add_filter( 'page_row_actions', [ $this, 'add_row_actions' ], 10, 2 );
 		add_action( 'admin_post_ctg_convert', [ $this, 'handle_convert' ] );
 		add_action( 'admin_post_ctg_preview', [ $this, 'handle_preview' ] );
+
+		add_action( 'admin_init', [ $this, 'register_bulk_actions' ] );
+	}
+
+	/**
+	 * Register the bulk action on all public post type list tables.
+	 *
+	 * @return void
+	 */
+	public function register_bulk_actions(): void {
+		foreach ( get_post_types( [ 'public' => true ] ) as $post_type ) {
+			$screen = 'edit-' . $post_type;
+			add_filter( 'bulk_actions-' . $screen, [ $this, 'add_bulk_action' ] );
+			add_filter( 'handle_bulk_actions-' . $screen, [ $this, 'handle_bulk_convert' ], 10, 3 );
+		}
 	}
 
 	/**
@@ -122,6 +137,78 @@ class RowAction {
 
 		wp_safe_redirect( $redirect );
 		exit();
+	}
+
+	/**
+	 * Add "Convert to Blocks" to the bulk actions dropdown.
+	 *
+	 * @param string[] $actions Existing bulk actions.
+	 *
+	 * @return string[]
+	 */
+	public function add_bulk_action( array $actions ): array {
+		$actions['ctg_bulk_convert'] = __( 'Convert to Blocks', 'classic-to-gutenberg' );
+		return $actions;
+	}
+
+	/**
+	 * Handle the bulk convert action.
+	 *
+	 * @param string $redirect_url The redirect URL.
+	 * @param string $action       The bulk action name.
+	 * @param int[]  $post_ids     Selected post IDs.
+	 *
+	 * @return string
+	 */
+	public function handle_bulk_convert( string $redirect_url, string $action, array $post_ids ): string {
+		if ( $action !== 'ctg_bulk_convert' ) {
+			return $redirect_url;
+		}
+
+		$runner        = new MigrationRunner( $this->converter );
+		$converted_ids = [];
+		$failed        = 0;
+
+		foreach ( $post_ids as $post_id ) {
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				$failed++;
+				continue;
+			}
+
+			$result = $runner->convert_post( $post_id );
+			if ( $result->success ) {
+				$converted_ids[] = $post_id;
+			} else {
+				$failed++;
+			}
+		}
+
+		$transient_key = 'ctg_notice_' . get_current_user_id();
+		if ( $converted_ids !== [] ) {
+			set_transient(
+				$transient_key,
+				[
+					'type'     => 'converted',
+					'post_ids' => $converted_ids,
+				],
+				30,
+			);
+		} elseif ( $failed > 0 ) {
+			set_transient(
+				$transient_key,
+				[
+					'type'    => 'error',
+					'message' => \sprintf(
+						/* translators: %d: number of failed posts */
+						__( '%d post(s) failed to convert.', 'classic-to-gutenberg' ),
+						$failed,
+					),
+				],
+				30,
+			);
+		}
+
+		return $redirect_url;
 	}
 
 	/**

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.1] - Unreleased
 
+### Added
+
+- Bulk action "Convert to Blocks" in post list dropdown
+
 ### Fixed
 
 - Graceful admin notice when `vendor/autoload.php` is missing instead of fatal error
