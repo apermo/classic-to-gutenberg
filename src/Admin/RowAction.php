@@ -68,7 +68,7 @@ class RowAction {
 		);
 
 		$actions['ctg_preview'] = \sprintf(
-			'<a href="%s">%s</a>',
+			'<a href="%s" target="_blank">%s</a>',
 			esc_url( $preview_url ),
 			esc_html__( 'Preview Blocks', 'classic-to-gutenberg' ),
 		);
