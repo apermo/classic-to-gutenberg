@@ -79,7 +79,7 @@ class RowAction {
 			return $actions;
 		}
 
-		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+		if ( ! $this->current_user_can_convert() ) {
 			return $actions;
 		}
 
@@ -118,7 +118,7 @@ class RowAction {
 
 		check_admin_referer( 'ctg_convert_' . $post_id );
 
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		if ( ! $this->current_user_can_convert() ) {
 			wp_die( esc_html__( 'You do not have permission to convert this post.', 'classic-to-gutenberg' ) );
 		}
 
@@ -179,7 +179,7 @@ class RowAction {
 	 * @return string
 	 */
 	public function handle_bulk_convert( string $redirect_url, string $action, array $post_ids ): string {
-		if ( $action !== 'ctg_bulk_convert' ) {
+		if ( $action !== 'ctg_bulk_convert' || ! $this->current_user_can_convert() ) {
 			return $redirect_url;
 		}
 
@@ -188,11 +188,6 @@ class RowAction {
 		$failed        = 0;
 
 		foreach ( $post_ids as $post_id ) {
-			if ( ! current_user_can( 'edit_post', $post_id ) ) {
-				$failed++;
-				continue;
-			}
-
 			$result = $runner->convert_post( $post_id );
 			if ( $result->success ) {
 				$converted_ids[] = $post_id;
@@ -239,7 +234,7 @@ class RowAction {
 
 		check_admin_referer( 'ctg_preview_' . $post_id );
 
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		if ( ! $this->current_user_can_convert() ) {
 			wp_die( esc_html__( 'You do not have permission to preview this post.', 'classic-to-gutenberg' ) );
 		}
 
@@ -336,6 +331,21 @@ class RowAction {
 		</html>
 		<?php
 		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/**
+	 * Check whether the current user has permission to convert posts.
+	 *
+	 * Requires super admin on multisite, manage_options on single site.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_convert(): bool {
+		if ( is_multisite() ) {
+			return is_super_admin();
+		}
+
+		return current_user_can( 'manage_options' );
 	}
 
 	/**

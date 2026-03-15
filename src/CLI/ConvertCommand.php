@@ -79,8 +79,9 @@ class ConvertCommand {
 			WP_CLI::error( 'No user set. Use --user=<id|login|email> to specify which user runs the conversion.' );
 		}
 
-		if ( ! user_can( $user, 'manage_options' ) ) {
-			WP_CLI::error( \sprintf( 'User "%s" is not an administrator.', $user->user_login ) );
+		$is_admin = is_multisite() ? is_super_admin( $user->ID ) : user_can( $user, 'manage_options' );
+		if ( ! $is_admin ) {
+			WP_CLI::error( \sprintf( 'User "%s" does not have sufficient permissions.', $user->user_login ) );
 		}
 
 		WP_CLI::log( \sprintf( 'Running as: %s (#%d)', $user->user_login, $user->ID ) );
