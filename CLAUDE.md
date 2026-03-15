@@ -14,7 +14,7 @@ GitHub template repository for bootstrapping WordPress plugins and themes. Ships
 
 Both modes coexist in the repo. The `setup.sh` script (see #10) removes the irrelevant set after the developer picks a mode.
 
-**Plugin mode files:** `plugin-name.php` (main file), `src/Plugin.php`, `uninstall.php`
+**Plugin mode files:** `plugin.php` (main file), `src/Plugin.php`, `uninstall.php`
 **Theme mode files:** `style.css`, `functions.php`, `src/Theme.php`, `templates/`, `parts/`, `assets/`
 **Shared:** `src/` (PSR-4 root), `tests/`, `composer.json`, CI config, DDEV config
 

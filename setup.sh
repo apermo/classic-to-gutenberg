@@ -110,11 +110,6 @@ replace_in_files "Plugin_Name" "$PASCAL_UNDER"
 replace_in_files "plugin_name" "$SNAKE_CASE"
 replace_in_files "plugin-name" "$SLUG"
 
-# --- Rename main plugin file ---
-
-git mv "plugin-name.php" "${SLUG}.php"
-info "Renamed plugin-name.php → ${SLUG}.php"
-
 # --- Mode cleanup ---
 
 info "Configuring ${PROJECT_MODE} mode..."
@@ -135,7 +130,7 @@ if [ "$PROJECT_MODE" = "plugin" ]; then
     sedi '/- functions.php/d' phpstan.neon.dist
 else
     # Remove plugin files
-    rm -f "${SLUG}.php" uninstall.php
+    rm -f plugin.php uninstall.php
     rm -f src/Plugin.php
     rm -f tests/Unit/PluginTest.php
 
@@ -149,11 +144,11 @@ else
     sedi 's|PROJECT_MODE=plugin|PROJECT_MODE=theme|' .ddev/.env
 
     # Clean phpcs.xml.dist
-    sedi "/<file>${SLUG}.php<\/file>/d" phpcs.xml.dist
+    sedi '/<file>plugin.php<\/file>/d' phpcs.xml.dist
     sedi '/<file>uninstall.php<\/file>/d' phpcs.xml.dist
 
     # Clean phpstan.neon.dist
-    sedi "/- ${SLUG}.php/d" phpstan.neon.dist
+    sedi '/- plugin.php/d' phpstan.neon.dist
     sedi '/- uninstall.php/d' phpstan.neon.dist
 
     # Update readme.txt for theme mode

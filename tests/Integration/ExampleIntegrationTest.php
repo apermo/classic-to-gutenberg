@@ -26,12 +26,12 @@ class ExampleIntegrationTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_project_is_active(): void {
-		$plugin_file = dirname( __DIR__, 2 ) . '/plugin-name.php';
+		$plugin_file = dirname( __DIR__, 2 ) . '/plugin.php';
 
 		if ( file_exists( $plugin_file ) ) {
-			$this->assertTrue(
-				defined( 'PLUGIN_NAME_VERSION' ),
-				'Plugin constant PLUGIN_NAME_VERSION should be defined.',
+			$this->assertNotEmpty(
+				\Plugin_Name\Plugin::VERSION,
+				'Plugin version should be set.',
 			);
 		} else {
 			$this->assertNotFalse(
