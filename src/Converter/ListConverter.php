@@ -17,6 +17,23 @@ class ListConverter extends AbstractBlockConverter {
 	}
 
 	/**
+	 * Refine matching: require properly closed list.
+	 *
+	 * @param string $tag_name The tag name.
+	 * @param string $html     The list HTML.
+	 *
+	 * @return bool
+	 */
+	public function can_convert( string $tag_name, string $html ): bool {
+		if ( ! parent::can_convert( $tag_name, $html ) ) {
+			return false;
+		}
+
+		$close_tag = '</' . $tag_name . '>';
+		return stripos( $html, $close_tag ) !== false;
+	}
+
+	/**
 	 * Convert a list element to a list block.
 	 *
 	 * @param string $html The list HTML.
@@ -62,27 +79,99 @@ class ListConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function wrap_list_items( string $html ): string {
-		$result = preg_replace_callback(
-			'/<li(?:\s[^>]*)?>(.*?)<\/li>/s',
-			[ $this, 'convert_list_item' ],
-			$html,
-		);
+		preg_match( '/^(<(?:ul|ol)(?:\s[^>]*)?>)\s*/i', $html, $open_match );
+		preg_match( '/\s*(<\/(?:ul|ol)\s*>)\s*$/i', $html, $close_match );
 
-		return $result ?? $html;
+		$open_tag  = $open_match[1];
+		$close_tag = $close_match[1];
+
+		$item_contents = $this->extract_list_items( $html );
+
+		$items = [];
+		foreach ( $item_contents as $content ) {
+			$items[] = $this->convert_list_item_content( $content );
+		}
+
+		return $open_tag . implode( "\n\n", $items ) . $close_tag;
 	}
 
 	/**
-	 * Convert a single list item, recursively processing nested lists.
+	 * Extract inner content of each top-level <li> in a list, respecting nesting.
 	 *
-	 * @param string[] $matches Regex match groups.
+	 * @param string $html The list HTML.
+	 *
+	 * @return string[] Array of inner content strings for each <li>.
+	 */
+	private function extract_list_items( string $html ): array {
+		$items  = [];
+		$offset = 0;
+		$length = strlen( $html );
+
+		while ( $offset < $length ) {
+			if ( ! preg_match( '/<li(?:\s[^>]*)?>/', $html, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
+				break;
+			}
+
+			$li_start      = $match[0][1];
+			$content_start = $li_start + strlen( $match[0][0] );
+			$content_end   = $this->find_closing_li( $html, $content_start );
+
+			$items[] = substr( $html, $content_start, $content_end - $content_start );
+			$offset  = $content_end + strlen( '</li>' );
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Find the position of the closing </li> tag that matches an opening <li>.
+	 *
+	 * Tracks nesting depth to handle nested lists with their own <li> tags.
+	 *
+	 * @param string $html   The HTML to search in.
+	 * @param int    $offset Position after the opening <li> tag.
+	 *
+	 * @return int Position of the matching </li>.
+	 */
+	private function find_closing_li( string $html, int $offset ): int {
+		$depth  = 1;
+		$length = strlen( $html );
+
+		while ( $offset < $length && $depth > 0 ) {
+			if ( ! preg_match( '/<li(?:\s[^>]*)?>|<\/li\s*>/i', $html, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
+				return $length;
+			}
+
+			$match_str    = $match[0][0];
+			$match_offset = $match[0][1];
+
+			if ( stripos( $match_str, '</li' ) === 0 ) {
+				--$depth;
+				if ( $depth === 0 ) {
+					return $match_offset;
+				}
+			} else {
+				++$depth;
+			}
+
+			$offset = $match_offset + strlen( $match_str );
+		}
+
+		return $length;
+	}
+
+	/**
+	 * Convert a single list item's content, recursively processing nested lists.
+	 *
+	 * @param string $content The inner content of the <li>.
 	 *
 	 * @return string
 	 */
-	private function convert_list_item( array $matches ): string {
-		$content = preg_replace_callback(
-			'/<(ul|ol)(?:\s[^>]*)?>.*?<\/\1>/s',
+	private function convert_list_item_content( string $content ): string {
+		$content = (string) preg_replace_callback(
+			'/\s*<(ul|ol)(?:\s[^>]*)?>[\s\S]*?<\/\1\s*>\s*/i',
 			[ $this, 'convert_nested_list' ],
-			$matches[1],
+			$content,
 		);
 
 		return "<!-- wp:list-item -->\n<li>" . $content . "</li>\n<!-- /wp:list-item -->";
@@ -99,7 +188,7 @@ class ListConverter extends AbstractBlockConverter {
 		$nested_tag = strtolower( $matches[1] );
 		$is_ordered = $nested_tag === 'ol';
 		$attrs      = $is_ordered ? [ 'ordered' => true ] : [];
-		$inner      = $this->convert_list( $matches[0], $is_ordered );
+		$inner      = $this->convert_list( trim( $matches[0] ), $is_ordered );
 
 		return $this->wrap_block( 'list', $inner, $attrs );
 	}

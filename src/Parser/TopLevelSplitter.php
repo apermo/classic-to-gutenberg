@@ -171,14 +171,14 @@ class TopLevelSplitter {
 	}
 
 	/**
-	 * Normalize <br> to <br/>.
+	 * Normalize bare <br> to <br/>, preserving wpautop's <br /> format.
 	 *
 	 * @param string $html Input HTML.
 	 *
 	 * @return string
 	 */
 	private function normalize_br( string $html ): string {
-		return (string) preg_replace( '/<br\s*\/?>/', '<br/>', $html );
+		return (string) preg_replace( '/<br\s*>/', '<br/>', $html );
 	}
 
 	/**

@@ -152,7 +152,7 @@ class TopLevelSplitterTest extends TestCase {
 	}
 
 	/**
-	 * Normalizes br tags to self-closing.
+	 * Normalizes bare <br> to <br/>, preserving wpautop's <br />.
 	 *
 	 * @return void
 	 */
@@ -162,7 +162,7 @@ class TopLevelSplitterTest extends TestCase {
 
 		$this->assertCount( 1, $elements );
 		$this->assertStringContainsString( '<br/>', $elements[0]->html );
-		$this->assertStringNotContainsString( '<br>', $elements[0]->html );
+		$this->assertStringContainsString( '<br />', $elements[0]->html );
 	}
 
 	/**

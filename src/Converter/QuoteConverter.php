@@ -36,6 +36,9 @@ class QuoteConverter extends AbstractBlockConverter {
 	/**
 	 * Convert inner blockquote content: wrap <p> in paragraph blocks, keep <cite> as-is.
 	 *
+	 * Handles wpautop wrapping <cite> in <p> tags by detecting paragraphs
+	 * that contain only a <cite> element and stripping the <p> wrapper.
+	 *
 	 * @param string $inner Inner HTML of the blockquote.
 	 *
 	 * @return string
@@ -61,7 +64,10 @@ class QuoteConverter extends AbstractBlockConverter {
 				continue;
 			}
 
-			if ( preg_match( '/^<p(?:\s[^>]*)?>.*<\/p>$/s', $part ) ) {
+			if ( $this->is_cite_paragraph( $part ) ) {
+				$result .= $this->extract_cite( $part );
+				$prev_was_paragraph = false;
+			} elseif ( preg_match( '/^<p(?:\s[^>]*)?>.*<\/p>$/s', $part ) ) {
 				if ( $prev_was_paragraph ) {
 					$result .= "\n\n";
 				}
@@ -74,5 +80,32 @@ class QuoteConverter extends AbstractBlockConverter {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Check if a paragraph contains only a <cite> element.
+	 *
+	 * WordPress wpautop wraps standalone <cite> tags in <p> tags.
+	 *
+	 * @param string $part The HTML part to check.
+	 *
+	 * @return bool
+	 */
+	private function is_cite_paragraph( string $part ): bool {
+		return (bool) preg_match( '/^<p(?:\s[^>]*)?>\s*<cite>.*?<\/cite>\s*<\/p>$/s', $part );
+	}
+
+	/**
+	 * Extract <cite> element from a paragraph wrapper.
+	 *
+	 * @param string $part The <p><cite>...</cite></p> HTML.
+	 *
+	 * @return string The bare <cite>...</cite> element.
+	 */
+	private function extract_cite( string $part ): string {
+		if ( preg_match( '/<cite>.*?<\/cite>/s', $part, $match ) ) {
+			return $match[0];
+		}
+		return $part;
 	}
 }

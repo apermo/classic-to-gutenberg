@@ -108,11 +108,14 @@ class ImageConverter extends AbstractBlockConverter {
 	 */
 	private function convert_figure( string $html ): string {
 		preg_match( '/<img\s[^>]*\/?>/i', $html, $img_match );
-		$attrs = $this->extract_image_attrs( $img_match[0] );
+		$img_attrs = $this->extract_image_attrs( $img_match[0] );
 
+		$align = '';
 		if ( preg_match( '/class="[^"]*align(left|right|center|none)[^"]*"/', $html, $align_match ) ) {
-			$attrs['align'] = $align_match[1];
+			$align = $align_match[1];
 		}
+
+		$attrs = $this->build_figure_attrs( $img_attrs, $align );
 
 		$clean_img = $this->build_clean_img( $img_match[0] );
 
@@ -125,6 +128,38 @@ class ImageConverter extends AbstractBlockConverter {
 			. $clean_img . $caption . '</figure>';
 
 		return $this->wrap_block( 'image', $figure, $attrs );
+	}
+
+	/**
+	 * Build ordered block attributes for a figure element.
+	 *
+	 * Ensures attribute order: id, align, width, height.
+	 *
+	 * @param array<string, mixed> $img_attrs Attributes extracted from <img>.
+	 * @param string               $align     Alignment value (empty if none).
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function build_figure_attrs( array $img_attrs, string $align ): array {
+		$attrs = [];
+
+		if ( isset( $img_attrs['id'] ) ) {
+			$attrs['id'] = $img_attrs['id'];
+		}
+
+		if ( $align !== '' ) {
+			$attrs['align'] = $align;
+		}
+
+		if ( isset( $img_attrs['width'] ) ) {
+			$attrs['width'] = $img_attrs['width'];
+		}
+
+		if ( isset( $img_attrs['height'] ) ) {
+			$attrs['height'] = $img_attrs['height'];
+		}
+
+		return $attrs;
 	}
 
 	/**
