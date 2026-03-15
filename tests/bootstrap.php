@@ -31,7 +31,7 @@ if ( $wp_tests_dir !== false && is_dir( $wp_tests_dir ) ) {
  * @return void
  */
 function plugin_name_tests_load_project(): void {
-	$plugin_file = dirname( __DIR__ ) . '/plugin-name.php';
+	$plugin_file = dirname( __DIR__ ) . '/plugin.php';
 	if ( file_exists( $plugin_file ) ) {
 		require $plugin_file;
 	} else {
