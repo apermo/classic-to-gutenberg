@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Plugin_Name;
 
-defined( 'ABSPATH' ) || exit();
+\defined( 'ABSPATH' ) || exit();
 
 require_once __DIR__ . '/vendor/autoload.php';
 
