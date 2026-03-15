@@ -21,8 +21,6 @@ class ClassicPostFinder {
 
 		$defaults = [
 			'post_type' => [ 'post', 'page' ],
-			'limit'     => 100,
-			'offset'    => 0,
 		];
 
 		/**
@@ -39,8 +37,6 @@ class ClassicPostFinder {
 		$args          = wp_parse_args( $filtered_args, $defaults );
 
 		$post_types = (array) $args['post_type'];
-		$limit      = (int) $args['limit'];
-		$offset     = (int) $args['offset'];
 		$type_in    = \implode( ',', \array_fill( 0, \count( $post_types ), '%s' ) );
 
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- dynamic IN clause
@@ -49,9 +45,8 @@ class ClassicPostFinder {
 			WHERE post_type IN ({$type_in})
 			AND post_content NOT LIKE %s
 			AND post_content != ''
-			ORDER BY ID ASC
-			LIMIT %d OFFSET %d",
-			...\array_merge( $post_types, [ '%<!-- wp:%', $limit, $offset ] ),
+			ORDER BY ID ASC",
+			...\array_merge( $post_types, [ '%<!-- wp:%' ] ),
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 

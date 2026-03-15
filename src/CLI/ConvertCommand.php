@@ -69,16 +69,13 @@ class ConvertCommand {
 	 * [--post-type=<types>]
 	 * : Comma-separated post types. Default: post,page.
 	 *
-	 * [--batch-size=<number>]
-	 * : Number of posts per batch. Default: 50.
-	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp classic-to-gutenberg convert --dry-run
 	 *     wp classic-to-gutenberg convert 42
 	 *     wp classic-to-gutenberg convert 42 43 44
 	 *     wp classic-to-gutenberg convert 42,43,44 --dry-run
-	 *     wp classic-to-gutenberg convert --post-type=post --batch-size=100
+	 *     wp classic-to-gutenberg convert --post-type=post,page
 	 *
 	 * @param string[]             $args       Positional arguments (post IDs).
 	 * @param array<string,string> $assoc_args Associative arguments.
@@ -106,11 +103,16 @@ class ConvertCommand {
 		$dry_run  = (bool) Utils\get_flag_value( $assoc_args, 'dry-run', false );
 		$post_ids = $this->parse_post_ids( $args );
 
-		if ( $post_ids !== [] ) {
-			$this->run_conversion( $post_ids, $dry_run );
-		} else {
-			$this->run_query_conversion( $assoc_args, $dry_run );
+		if ( $post_ids === [] ) {
+			$post_ids = $this->find_classic_posts( $assoc_args );
 		}
+
+		if ( $post_ids === [] ) {
+			WP_CLI::success( 'No classic posts found.' );
+			return;
+		}
+
+		$this->run_conversion( $post_ids, $dry_run );
 
 		$prefix = $dry_run ? 'Would convert' : 'Converted';
 		WP_CLI::success(
@@ -152,7 +154,25 @@ class ConvertCommand {
 	}
 
 	/**
-	 * Run conversion on explicit post IDs with progress bar.
+	 * Find classic posts via query.
+	 *
+	 * @param array<string,string> $assoc_args Associative arguments.
+	 *
+	 * @return int[]
+	 */
+	private function find_classic_posts( array $assoc_args ): array {
+		$finder     = new ClassicPostFinder();
+		$query_args = [ 'limit' => 0 ];
+
+		if ( isset( $assoc_args['post-type'] ) ) {
+			$query_args['post_type'] = \explode( ',', $assoc_args['post-type'] );
+		}
+
+		return $finder->find( $query_args );
+	}
+
+	/**
+	 * Run conversion on post IDs with progress bar.
 	 *
 	 * @param int[] $post_ids Post IDs to convert.
 	 * @param bool  $dry_run  Whether to preview only.
@@ -174,57 +194,9 @@ class ConvertCommand {
 	}
 
 	/**
-	 * Run conversion on posts found by query with progress bar.
-	 *
-	 * @param array<string,string> $assoc_args Associative arguments.
-	 * @param bool                 $dry_run    Whether to preview only.
-	 *
-	 * @return void
-	 */
-	private function run_query_conversion( array $assoc_args, bool $dry_run ): void {
-		$batch_size = (int) ( $assoc_args['batch-size'] ?? 50 );
-		$finder     = new ClassicPostFinder();
-		$runner     = new MigrationRunner( $this->converter );
-		$query_args = [ 'limit' => $batch_size ];
-
-		if ( isset( $assoc_args['post-type'] ) ) {
-			$query_args['post_type'] = \explode( ',', $assoc_args['post-type'] );
-		}
-
-		$total = $finder->count( $query_args );
-
-		if ( $total === 0 ) {
-			WP_CLI::log( 'No classic posts found.' );
-			return;
-		}
-
-		$progress = Utils\make_progress_bar( $this->get_progress_label( $dry_run ), $total );
-		$offset   = 0;
-
-		while ( true ) {
-			$query_args['offset'] = $offset;
-			$post_ids             = $finder->find( $query_args );
-
-			if ( $post_ids === [] ) {
-				break;
-			}
-
-			foreach ( $post_ids as $post_id ) {
-				$result = $runner->convert_post( $post_id, $dry_run );
-				$this->track_result( $result );
-				$progress->tick( 1, $this->get_tick_message( $total ) );
-			}
-
-			$offset += $batch_size;
-		}
-
-		$progress->finish();
-	}
-
-	/**
 	 * Track a migration result in statistics.
 	 *
-	 * @param \Apermo\ClassicToGutenberg\Migration\MigrationResult $result The result.
+	 * @param MigrationResult $result The result.
 	 *
 	 * @return void
 	 */
