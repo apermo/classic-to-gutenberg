@@ -68,7 +68,7 @@ class MigrationRunner {
 		);
 
 		// Unlock the post. There is no dedicated unlock function.
-		update_post_meta( $post_id, '_edit_lock', false );
+		delete_post_meta( $post_id, '_edit_lock' );
 
 		if ( is_wp_error( $updated ) ) {
 			return new MigrationResult( $post_id, false, $original, $converted, $updated->get_error_message() );

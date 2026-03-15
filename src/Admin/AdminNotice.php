@@ -32,7 +32,10 @@ class AdminNotice {
 		delete_transient( 'ctg_notice_' . $user_id );
 
 		if ( $notice['type'] === 'converted' ) {
-			$this->display_success_notice( (array) ( $notice['post_ids'] ?? [] ) );
+			$this->display_success_notice(
+				(array) ( $notice['post_ids'] ?? [] ),
+				(int) ( $notice['failed'] ?? 0 ),
+			);
 			return;
 		}
 
@@ -42,20 +45,41 @@ class AdminNotice {
 	}
 
 	/**
-	 * Display success notice with post links.
+	 * Display success notice with post links and optional failure count.
 	 *
 	 * @param int[] $post_ids Converted post IDs.
+	 * @param int   $failed   Number of failed conversions.
 	 *
 	 * @return void
 	 */
-	private function display_success_notice( array $post_ids ): void {
-		echo '<div class="notice notice-success is-dismissible">';
-		echo '<p>' . esc_html__( 'Post successfully converted to blocks.', 'classic-to-gutenberg' ) . '</p>';
+	private function display_success_notice( array $post_ids, int $failed = 0 ): void {
+		$notice_type = $failed > 0 && $post_ids === [] ? 'notice-error' : 'notice-success';
 
-		if ( \count( $post_ids ) === 1 ) {
-			$this->render_single_post_link( $post_ids[0] );
-		} elseif ( \count( $post_ids ) > 1 ) {
-			$this->render_post_list( $post_ids );
+		echo '<div class="notice ' . esc_attr( $notice_type ) . ' is-dismissible">';
+
+		if ( $post_ids !== [] ) {
+			echo '<p>' . esc_html__( 'Post successfully converted to blocks.', 'classic-to-gutenberg' ) . '</p>';
+
+			if ( \count( $post_ids ) === 1 ) {
+				$this->render_single_post_link( $post_ids[0] );
+			} else {
+				$this->render_post_list( $post_ids );
+			}
+		}
+
+		if ( $failed > 0 ) {
+			echo '<p>' . esc_html(
+				\sprintf(
+					/* translators: %d: number of failed posts */
+					_n(
+						'%d post failed to convert.',
+						'%d posts failed to convert.',
+						$failed,
+						'classic-to-gutenberg',
+					),
+					$failed,
+				),
+			) . '</p>';
 		}
 
 		echo '</div>';

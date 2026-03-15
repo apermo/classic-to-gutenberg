@@ -197,29 +197,15 @@ class RowAction {
 		}
 
 		$transient_key = 'ctg_notice_' . get_current_user_id();
-		if ( $converted_ids !== [] ) {
-			set_transient(
-				$transient_key,
-				[
-					'type'     => 'converted',
-					'post_ids' => $converted_ids,
-				],
-				30,
-			);
-		} elseif ( $failed > 0 ) {
-			set_transient(
-				$transient_key,
-				[
-					'type'    => 'error',
-					'message' => \sprintf(
-						/* translators: %d: number of failed posts */
-						__( '%d post(s) failed to convert.', 'classic-to-gutenberg' ),
-						$failed,
-					),
-				],
-				30,
-			);
-		}
+		set_transient(
+			$transient_key,
+			[
+				'type'     => 'converted',
+				'post_ids' => $converted_ids,
+				'failed'   => $failed,
+			],
+			30,
+		);
 
 		return $redirect_url;
 	}
