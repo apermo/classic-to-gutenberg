@@ -42,6 +42,6 @@ class Permission {
 		 *
 		 * @return bool
 		 */
-		return apply_filters( 'classic_to_gutenberg_user_can_convert', $can_convert, $user );
+		return (bool) apply_filters( 'classic_to_gutenberg_user_can_convert', $can_convert, $user ); // @phpstan-ignore cast.useless
 	}
 }
