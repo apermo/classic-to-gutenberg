@@ -1,4 +1,4 @@
-name: Integration Tests
+name: WP Integration
 
 on:
     push:
