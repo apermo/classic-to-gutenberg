@@ -93,16 +93,31 @@ class RowAction {
 		$runner = new MigrationRunner( $this->converter );
 		$result = $runner->convert_post( $post_id );
 
-		$redirect = admin_url( 'edit.php' );
-		$post     = get_post( $post_id );
-		if ( $post !== null ) {
-			$redirect = admin_url( 'edit.php?post_type=' . $post->post_type );
+		$redirect = wp_get_referer();
+		if ( $redirect === false ) {
+			$post     = get_post( $post_id );
+			$redirect = admin_url( 'edit.php?post_type=' . ( $post->post_type ?? 'post' ) );
 		}
 
+		$transient_key = 'ctg_notice_' . get_current_user_id();
 		if ( $result->success ) {
-			set_transient( 'ctg_notice_' . get_current_user_id(), 'converted', 30 );
+			set_transient(
+				$transient_key,
+				[
+					'type' => 'converted',
+					'post_ids' => [ $post_id ],
+				],
+				30,
+			);
 		} else {
-			set_transient( 'ctg_notice_' . get_current_user_id(), 'error:' . $result->error, 30 );
+			set_transient(
+				$transient_key,
+				[
+					'type' => 'error',
+					'message' => $result->error,
+				],
+				30,
+			);
 		}
 
 		wp_safe_redirect( $redirect );
