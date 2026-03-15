@@ -10,3 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial project setup from template
+- Content splitter (`TopLevelSplitter`) for parsing wpautop'd HTML
+- Core block converters: paragraph, heading, separator, preformatted, more, nextpage, list, quote, table, image
+- Shortcode handlers: `[caption]` → `core/image`, `[gallery]` → `core/gallery`, unknown → `core/shortcode`
+- Content conversion pipeline (`ContentConverter`) with wpautop integration
+- Migration infrastructure: `ClassicPostFinder`, `MigrationRunner`, `MigrationRollback`
+- WP-CLI commands: `status`, `convert`, `rollback`
+- Admin row actions: "Convert to Blocks" and "Preview Blocks" on post list
+- Extensibility hooks for converters, shortcode handlers, and migration lifecycle
+- Fixture-based integration tests for all conversion patterns

@@ -17,6 +17,70 @@ Batch migration of WordPress classic editor content to Gutenberg blocks.
 composer install
 ```
 
+## Usage
+
+### WP-CLI
+
+```bash
+# Show how many classic posts need conversion
+wp classic-to-gutenberg status
+
+# Preview conversion without saving
+wp classic-to-gutenberg convert --dry-run
+
+# Convert all classic posts
+wp classic-to-gutenberg convert
+
+# Convert specific post types
+wp classic-to-gutenberg convert --post-type=post,page --batch-size=100
+
+# Rollback a converted post
+wp classic-to-gutenberg rollback 42
+```
+
+### Admin Row Actions
+
+On the Posts/Pages list screen, classic posts (without block markup) show two additional row actions:
+
+- **Convert to Blocks** — converts the post content and saves immediately
+- **Preview Blocks** — shows a preview of the converted block markup without saving
+
+### Supported Conversions
+
+| Classic HTML | Gutenberg Block |
+|---|---|
+| `<p>` | `core/paragraph` |
+| `<h1>`–`<h6>` | `core/heading` |
+| `<ul>`, `<ol>` | `core/list` with `core/list-item` |
+| `<blockquote>` | `core/quote` with inner `core/paragraph` |
+| `<table>` | `core/table` (requires `<thead>` + `<tbody>`) |
+| `<img>` | `core/image` (standalone, linked, or in `<figure>`) |
+| `<pre>` | `core/preformatted` |
+| `<hr>` | `core/separator` |
+| `<!--more-->` | `core/more` |
+| `<!--nextpage-->` | `core/nextpage` |
+| `[caption]` | `core/image` with caption |
+| `[gallery]` | `core/gallery` with inner `core/image` |
+| Other shortcodes | `core/shortcode` |
+| Unrecognized HTML | `core/html` (fallback) |
+
+### Hooks
+
+#### Filters
+
+- `classic_to_gutenberg_converters` — register custom block converters
+- `classic_to_gutenberg_pre_convert` — filter content before conversion
+- `classic_to_gutenberg_post_convert` — filter content after conversion
+- `classic_to_gutenberg_finder_args` — filter post finder query arguments
+- `classic_to_gutenberg_shortcode_handlers` — extend shortcode handler registry
+
+#### Actions
+
+- `classic_to_gutenberg_post_converted` — fired after each post conversion
+- `classic_to_gutenberg_post_rolled_back` — fired after rollback
+- `classic_to_gutenberg_batch_started` — fired before batch conversion
+- `classic_to_gutenberg_batch_completed` — fired after batch conversion
+
 ## Development
 
 ```bash
