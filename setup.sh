@@ -123,9 +123,6 @@ if [ "$PROJECT_MODE" = "plugin" ]; then
     # Activate plugin docker-compose mount
     cp .ddev/docker-compose.plugin.yaml.dist .ddev/docker-compose.mount.yaml
 
-    # Clean phpcs.xml.dist
-    sedi '/<file>functions.php<\/file>/d' phpcs.xml.dist
-
     # Clean phpstan.neon.dist
     sedi '/- functions.php/d' phpstan.neon.dist
 else
@@ -142,10 +139,6 @@ else
 
     # Update DDEV .env
     sedi 's|PROJECT_MODE=plugin|PROJECT_MODE=theme|' .ddev/.env
-
-    # Clean phpcs.xml.dist
-    sedi '/<file>plugin.php<\/file>/d' phpcs.xml.dist
-    sedi '/<file>uninstall.php<\/file>/d' phpcs.xml.dist
 
     # Clean phpstan.neon.dist
     sedi '/- plugin.php/d' phpstan.neon.dist

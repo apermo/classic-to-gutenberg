@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade `apermo/apermo-coding-standards` to 2.6.1
+- Configure `text_domain`, `prefixes`, and `minimum_wp_version` in `phpcs.xml.dist`
 
 ## [0.3.0] - 2026-03-15
 
