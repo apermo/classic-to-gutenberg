@@ -33,7 +33,7 @@ class RowAction {
 		add_action( 'admin_post_ctg_convert', [ $this, 'handle_convert' ] );
 		add_action( 'admin_post_ctg_preview', [ $this, 'handle_preview' ] );
 
-		add_action( 'admin_init', [ $this, 'register_bulk_actions' ] );
+		$this->register_bulk_actions();
 	}
 
 	/**
