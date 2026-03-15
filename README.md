@@ -7,8 +7,8 @@ Batch migration of WordPress classic editor content to Gutenberg blocks.
 
 ## Requirements
 
-- PHP 8.1+
-- WordPress 6.0+
+- PHP 8.2+
+- WordPress 6.2+
 - Composer
 
 ## Installation

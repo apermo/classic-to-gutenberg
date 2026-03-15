@@ -14,5 +14,5 @@ jobs:
                 ${{ github.event_name == 'push'
                     && '["8.2","8.3","8.4"]'
                     || '["8.2","8.4"]' }}
-            wp-versions: '["latest","6.6"]'
+            wp-versions: '["latest","6.2"]'
             multisite: 'both'

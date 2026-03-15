@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 WordPress plugin for batch migration of classic editor content to Gutenberg blocks. Converts HTML patterns (paragraphs, headings, images, lists, etc.) into their corresponding block editor equivalents using an extendable factory pattern.
 
-**PHP 8.1+ minimum.** Strict types everywhere (`declare(strict_types=1)`).
+**PHP 8.2+ minimum** (uses `readonly class`). **WordPress 6.2+** (uses `WP_HTML_Tag_Processor`). Strict types everywhere (`declare(strict_types=1)`).
 
 ## Architecture
 
