@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Tests\Unit\Converter;
 
-use PHPUnit\Framework\TestCase;
 use Apermo\ClassicToGutenberg\Converter\BlockConverterFactory;
 use Apermo\ClassicToGutenberg\Converter\BlockConverterInterface;
 use Apermo\ClassicToGutenberg\Converter\HtmlBlockConverter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for BlockConverterFactory.
@@ -113,7 +113,7 @@ class BlockConverterFactoryTest extends TestCase {
 	}
 
 	/**
-	 * get_converters returns all registered converters.
+	 * Returns all registered converters via get_converters.
 	 *
 	 * @return void
 	 */

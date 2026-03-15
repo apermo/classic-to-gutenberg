@@ -4,16 +4,26 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Tests\Unit\Parser;
 
-use PHPUnit\Framework\TestCase;
 use Apermo\ClassicToGutenberg\Parser\TopLevelSplitter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for TopLevelSplitter.
  */
 class TopLevelSplitterTest extends TestCase {
 
+	/**
+	 * The splitter under test.
+	 *
+	 * @var TopLevelSplitter
+	 */
 	private TopLevelSplitter $splitter;
 
+	/**
+	 * Set up the test splitter.
+	 *
+	 * @return void
+	 */
 	protected function setUp(): void {
 		$this->splitter = new TopLevelSplitter();
 	}

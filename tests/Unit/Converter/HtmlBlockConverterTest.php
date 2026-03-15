@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Tests\Unit\Converter;
 
-use PHPUnit\Framework\TestCase;
 use Apermo\ClassicToGutenberg\Converter\HtmlBlockConverter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for HtmlBlockConverter (fallback converter).

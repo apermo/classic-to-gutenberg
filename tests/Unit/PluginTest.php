@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 use Apermo\ClassicToGutenberg\Plugin;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for the Plugin class.
