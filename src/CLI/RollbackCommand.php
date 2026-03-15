@@ -34,11 +34,12 @@ class RollbackCommand {
 	 *     wp classic-to-gutenberg rollback 42
 	 *
 	 * @param string[]             $args       Positional arguments.
-	 * @param array<string,string> $assoc_args Associative arguments (unused).
+	 * @param array<string,string> $assoc_args Associative arguments.
 	 *
 	 * @return void
 	 */
 	public function execute( array $args, array $assoc_args ): void {
+		unset( $assoc_args );
 		$post_id  = (int) $args[0];
 		$rollback = new MigrationRollback();
 		$result   = $rollback->rollback( $post_id );
