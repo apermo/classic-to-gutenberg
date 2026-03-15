@@ -25,27 +25,126 @@ class AdminNotice {
 		$user_id = get_current_user_id();
 		$notice  = get_transient( 'ctg_notice_' . $user_id );
 
-		if ( $notice === false ) {
+		if ( ! \is_array( $notice ) || ! isset( $notice['type'] ) ) {
 			return;
 		}
 
 		delete_transient( 'ctg_notice_' . $user_id );
 
-		if ( $notice === 'converted' ) {
-			\printf(
-				'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
-				esc_html__( 'Post successfully converted to blocks.', 'classic-to-gutenberg' ),
+		if ( $notice['type'] === 'converted' ) {
+			$this->display_success_notice(
+				(array) ( $notice['post_ids'] ?? [] ),
+				(int) ( $notice['failed'] ?? 0 ),
 			);
 			return;
 		}
 
-		if ( \str_starts_with( (string) $notice, 'error:' ) ) {
-			$error_message = \substr( (string) $notice, 6 );
+		if ( $notice['type'] === 'error' ) {
+			$this->display_error_notice( (string) ( $notice['message'] ?? '' ) );
+		}
+	}
+
+	/**
+	 * Display success notice with post links and optional failure count.
+	 *
+	 * @param int[] $post_ids Converted post IDs.
+	 * @param int   $failed   Number of failed conversions.
+	 *
+	 * @return void
+	 */
+	private function display_success_notice( array $post_ids, int $failed = 0 ): void {
+		$notice_type = $failed > 0 && $post_ids === [] ? 'notice-error' : 'notice-success';
+
+		echo '<div class="notice ' . esc_attr( $notice_type ) . ' is-dismissible">';
+
+		if ( $post_ids !== [] ) {
+			echo '<p>' . esc_html__( 'Post successfully converted to blocks.', 'classic-to-gutenberg' ) . '</p>';
+
+			if ( \count( $post_ids ) === 1 ) {
+				$this->render_single_post_link( $post_ids[0] );
+			} else {
+				$this->render_post_list( $post_ids );
+			}
+		}
+
+		if ( $failed > 0 ) {
+			echo '<p>' . esc_html(
+				\sprintf(
+					/* translators: %d: number of failed posts */
+					_n(
+						'%d post failed to convert.',
+						'%d posts failed to convert.',
+						$failed,
+						'classic-to-gutenberg',
+					),
+					$failed,
+				),
+			) . '</p>';
+		}
+
+		echo '</div>';
+	}
+
+	/**
+	 * Render a single post link.
+	 *
+	 * @param int $post_id The post ID.
+	 *
+	 * @return void
+	 */
+	private function render_single_post_link( int $post_id ): void {
+		$post = get_post( $post_id );
+		if ( $post === null ) {
+			return;
+		}
+
+		\printf(
+			'<p><a href="%s">%s</a></p>',
+			esc_url( get_edit_post_link( $post_id ) ?? '' ),
+			\sprintf(
+				/* translators: %s: post title */
+				esc_html__( 'Open "%s"', 'classic-to-gutenberg' ),
+				esc_html( get_the_title( $post ) ),
+			),
+		);
+	}
+
+	/**
+	 * Render a list of post links.
+	 *
+	 * @param int[] $post_ids The post IDs.
+	 *
+	 * @return void
+	 */
+	private function render_post_list( array $post_ids ): void {
+		echo '<ul>';
+		foreach ( $post_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if ( $post === null ) {
+				continue;
+			}
+
 			\printf(
-				'<div class="notice notice-error is-dismissible"><p>%s %s</p></div>',
-				esc_html__( 'Conversion failed:', 'classic-to-gutenberg' ),
-				esc_html( $error_message ),
+				'<li><a href="%s">%s</a></li>',
+				esc_url( get_edit_post_link( $post_id ) ?? '' ),
+				esc_html( get_the_title( $post ) ),
 			);
 		}
+		echo '</ul>';
+	}
+
+	/**
+	 * Display error notice.
+	 *
+	 * @param string $message The error message.
+	 *
+	 * @return void
+	 */
+	private function display_error_notice( string $message ): void {
+		\printf(
+			'<div class="notice notice-error is-dismissible"><p>%s %s</p></div>',
+			esc_html__( 'Conversion failed:', 'classic-to-gutenberg' ),
+			esc_html( $message ),
+		);
 	}
 }

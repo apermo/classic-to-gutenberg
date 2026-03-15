@@ -20,19 +20,19 @@ class MigrationRollback {
 		$revision_id = (int) get_post_meta( $post_id, '_ctg_revision_id', true );
 
 		if ( $revision_id === 0 ) {
-			return new MigrationResult( $post_id, false, '', '', 'No conversion revision found.' );
+			return new MigrationResult( $post_id, false, '', '', 'No conversion revision found.', MigrationResult::ERROR_NO_REVISION );
 		}
 
 		$revision = get_post( $revision_id );
 
 		if ( $revision === null ) {
-			return new MigrationResult( $post_id, false, '', '', 'Revision not found.' );
+			return new MigrationResult( $post_id, false, '', '', 'Revision not found.', MigrationResult::ERROR_NO_REVISION );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( $post === null ) {
-			return new MigrationResult( $post_id, false, '', '', 'Post not found.' );
+			return new MigrationResult( $post_id, false, '', '', 'Post not found.', MigrationResult::ERROR_NOT_FOUND );
 		}
 
 		$current  = $post->post_content;
