@@ -9,15 +9,37 @@ namespace Plugin_Name;
  */
 class Plugin {
 
+	public const VERSION = '0.1.0';
+
+	/**
+	 * Main plugin file path.
+	 *
+	 * @var string
+	 */
+	private static string $file = '';
+
 	/**
 	 * Initialize the plugin.
 	 *
+	 * @param string $file Main plugin file path.
+	 *
 	 * @return void
 	 */
-	public static function init(): void {
-		register_activation_hook( PLUGIN_NAME_FILE, [ self::class, 'activate' ] );
-		register_deactivation_hook( PLUGIN_NAME_FILE, [ self::class, 'deactivate' ] );
+	public static function init( string $file ): void {
+		self::$file = $file;
+
+		register_activation_hook( $file, [ self::class, 'activate' ] );
+		register_deactivation_hook( $file, [ self::class, 'deactivate' ] );
 		add_action( 'plugins_loaded', [ self::class, 'boot' ] );
+	}
+
+	/**
+	 * Return the main plugin file path.
+	 *
+	 * @return string
+	 */
+	public static function file(): string {
+		return self::$file;
 	}
 
 	/**

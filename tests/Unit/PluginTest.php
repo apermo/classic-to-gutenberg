@@ -22,10 +22,6 @@ class PluginTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
-
-		if ( ! defined( 'PLUGIN_NAME_FILE' ) ) {
-			define( 'PLUGIN_NAME_FILE', '/tmp/plugin.php' );
-		}
 	}
 
 	/**
@@ -43,20 +39,43 @@ class PluginTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_init_registers_activation_hooks(): void {
+	public function test_init_registers_hooks(): void {
+		$file = '/tmp/plugin.php';
+
 		Functions\expect( 'register_activation_hook' )
 			->once()
-			->with( PLUGIN_NAME_FILE, [ Plugin::class, 'activate' ] );
+			->with( $file, [ Plugin::class, 'activate' ] );
 
 		Functions\expect( 'register_deactivation_hook' )
 			->once()
-			->with( PLUGIN_NAME_FILE, [ Plugin::class, 'deactivate' ] );
+			->with( $file, [ Plugin::class, 'deactivate' ] );
 
 		Functions\expect( 'add_action' )
 			->once()
 			->with( 'plugins_loaded', [ Plugin::class, 'boot' ] );
 
-		Plugin::init();
+		Plugin::init( $file );
+	}
+
+	/**
+	 * Verify init stores the plugin file path.
+	 *
+	 * @return void
+	 */
+	public function test_init_stores_file_path(): void {
+		$file = '/tmp/plugin.php';
+
+		Functions\stubs(
+			[
+				'register_activation_hook',
+				'register_deactivation_hook',
+				'add_action',
+			],
+		);
+
+		Plugin::init( $file );
+
+		$this->assertSame( $file, Plugin::file() );
 	}
 
 	/**
