@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.0] - 2026-03-15
 
+### Added
+
+- `Requires at least` header in `plugin.php` and `style.css`
+- Integration test matrix auto-detects minimum WP version from plugin/theme header
+
 ### Changed
 
 - Upgrade `apermo/apermo-coding-standards` to 2.6.1
