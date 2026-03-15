@@ -99,8 +99,8 @@ class ConvertCommand {
 		}
 
 		$post_ids = [];
-		foreach ( $args as $value ) {
-			foreach ( explode( ',', $value ) as $part ) {
+		foreach ( $args as $argument ) {
+			foreach ( explode( ',', $argument ) as $part ) {
 				$part = trim( $part );
 				if ( $part !== '' && ctype_digit( $part ) ) {
 					$post_ids[] = (int) $part;
