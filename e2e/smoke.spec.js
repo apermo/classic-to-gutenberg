@@ -1,7 +1,9 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
+const USE_DDEV = !process.env.CI;
 const WP_PATH = process.env.WP_PATH || '/tmp/wordpress';
+const FIXTURES_SQL = 'tests/fixtures/testdata.sql';
 
 /**
  * Run a WP-CLI command and return stdout.
@@ -10,7 +12,11 @@ const WP_PATH = process.env.WP_PATH || '/tmp/wordpress';
  * @returns {string}
  */
 function wp(command) {
-    return execSync(`wp ${command} --path=${WP_PATH} --allow-root`, {
+    const cmd = USE_DDEV
+        ? `ddev wp ${command}`
+        : `wp ${command} --path=${WP_PATH} --allow-root`;
+
+    return execSync(cmd, {
         encoding: 'utf-8',
         timeout: 30000,
     }).trim();
@@ -20,7 +26,11 @@ function wp(command) {
  * Import test fixtures (can be called multiple times to reset state).
  */
 function importFixtures() {
-    wp(`db import ${process.cwd()}/tests/fixtures/testdata.sql`);
+    if (USE_DDEV) {
+        wp(`db import ${FIXTURES_SQL}`);
+    } else {
+        wp(`db import ${process.cwd()}/${FIXTURES_SQL}`);
+    }
 }
 
 test.describe.serial('Setup', () => {
