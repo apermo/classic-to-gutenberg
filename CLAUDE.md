@@ -33,6 +33,16 @@ WordPress plugin for batch migration of classic editor content to Gutenberg bloc
 
 The factory (`BlockConverterFactory`) maintains a registry of `BlockConverterInterface` implementations. Each converter declares which HTML tag(s) it handles. The factory iterates top-level DOM nodes and delegates to the matching converter. Unmatched nodes fall through to `HtmlBlockConverter` (wraps in `core/html` block). Third-party plugins can register custom converters via WordPress filter hooks.
 
+### Broken markup policy
+
+**Shit in, shit out.** The plugin does not attempt to repair broken HTML. If a converter cannot confidently parse a structure, it passes through as-is wrapped in a `core/html` block.
+
+Two exceptions:
+- `<br>` → `<br/>` normalization is acceptable
+- An opening `<p>` implicitly closes a preceding unclosed `<p>` (standard HTML behavior)
+
+Everything else: no tag closing, no attribute repair, no structural fixes. Broken content stays broken.
+
 ## Commands
 
 ```bash
