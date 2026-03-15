@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Classic to Gutenberg
  * Description: Batch migration from classic editor content to Gutenberg blocks.
- * Version:     0.2.1
+ * Version:     0.3.0
  * Author:      Christoph Daum
  * Author URI:  https://apermo.de
  * License:     GPL-2.0-or-later
@@ -17,7 +17,7 @@ namespace Apermo\ClassicToGutenberg;
 
 \defined( 'ABSPATH' ) || exit();
 
-\define( 'CLASSIC_TO_GUTENBERG_VERSION', '0.2.1' );
+\define( 'CLASSIC_TO_GUTENBERG_VERSION', '0.3.0' );
 \define( 'CLASSIC_TO_GUTENBERG_FILE', __FILE__ );
 \define( 'CLASSIC_TO_GUTENBERG_DIR', plugin_dir_path( __FILE__ ) );
 

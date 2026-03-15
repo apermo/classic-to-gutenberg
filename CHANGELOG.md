@@ -5,15 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.1] - Unreleased
+## [0.3.0] - 2026-03-15
 
 ### Added
 
-- Bulk action "Convert to Blocks" in post list dropdown
+- Bulk action "Convert to Blocks" in post list dropdown with section header
+- Side-by-side block preview: 2x2 grid comparing rendered content and raw markup
+- Post locking during conversion (respects `wp_check_post_lock`, acquires/releases lock)
+- `Permission::user_can_convert()` with `classic_to_gutenberg_user_can_convert` filter
+- WP-CLI `convert` command validates user and logs identity before running
+- Post links in success notice (single: "Open Post Title", batch: list of links)
+- Unit tests for permission checks (single site, multisite, filter grant/revoke)
+
+### Changed
+
+- Permission model: requires `manage_options` (single site) or super admin (multisite) instead of `edit_post`
+- Preview opens in new tab (`target="_blank"`) instead of navigating away
+- Convert redirect preserves referring page (filters, pagination)
+- Updated `.gitattributes` export-ignore list
 
 ### Fixed
 
-- Graceful admin notice when `vendor/autoload.php` is missing instead of fatal error
+- Graceful admin notice with plugin name when `vendor/autoload.php` is missing
+- Bulk action registration timing (was nested in `admin_init`, never fired)
 
 ## [0.2.0] - 2026-03-15
 
