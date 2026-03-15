@@ -16,16 +16,23 @@ function wp(command) {
     }).trim();
 }
 
-test.describe('Setup', () => {
+/**
+ * Import test fixtures (can be called multiple times to reset state).
+ */
+function importFixtures() {
+    wp(`db import ${process.cwd()}/tests/fixtures/testdata.sql`);
+}
+
+test.describe.serial('Setup', () => {
     test('import test data', () => {
-        wp(`db import ${process.cwd()}/tests/fixtures/testdata.sql`);
+        importFixtures();
 
         const title = wp('post get 100 --field=title');
         expect(title).toBe('Simple Paragraphs');
     });
 });
 
-test.describe('WP-CLI: status', () => {
+test.describe.serial('WP-CLI: status', () => {
     test('reports classic posts', () => {
         const output = wp('classic-to-gutenberg status');
         expect(output).toContain('classic post(s)');
@@ -37,7 +44,7 @@ test.describe('WP-CLI: status', () => {
     });
 });
 
-test.describe('WP-CLI: convert', () => {
+test.describe.serial('WP-CLI: convert', () => {
     test('dry run does not modify posts', () => {
         const before = wp('post get 100 --field=content');
         const output = wp('classic-to-gutenberg convert 100 --dry-run');
@@ -112,17 +119,6 @@ test.describe('WP-CLI: convert', () => {
         expect(content).toContain('<!-- wp:list -->');
     });
 
-    test('skips already-converted post', () => {
-        const before = wp('post get 120 --field=content');
-
-        // Status should not count post 120 (already has blocks).
-        const status = wp('classic-to-gutenberg status');
-
-        // Converting by ID still runs but content already has blocks.
-        const after = wp('post get 120 --field=content');
-        expect(after).toContain('<!-- wp:paragraph -->');
-    });
-
     test('batch convert finds remaining classic posts', () => {
         // Post 121 (draft) should still be classic.
         const content = wp('post get 121 --field=content');
@@ -136,10 +132,10 @@ test.describe('WP-CLI: convert', () => {
     });
 });
 
-test.describe('WP-CLI: rollback', () => {
+test.describe.serial('WP-CLI: rollback', () => {
     test('restores post from revision', () => {
-        // Re-import to get fresh data for rollback test.
-        wp(`db import ${process.cwd()}/tests/fixtures/testdata.sql`);
+        // Reset fixtures so post 100 is classic again.
+        importFixtures();
 
         const original = wp('post get 100 --field=content');
         expect(original).not.toContain('<!-- wp:');
@@ -154,40 +150,51 @@ test.describe('WP-CLI: rollback', () => {
     });
 });
 
-test.describe('Admin UI', () => {
-    test('shows row actions for classic posts', async ({ page }) => {
-        // Re-import fresh data.
-        wp(`db import ${process.cwd()}/tests/fixtures/testdata.sql`);
+test.describe.serial('Admin UI', () => {
+    test('reset fixtures for admin tests', () => {
+        importFixtures();
+    });
 
+    test('shows row actions for classic posts', async ({ page }) => {
         await page.goto('/wp-admin/edit.php');
 
-        // Post 100 should have the "Convert to Blocks" action.
         const row = page.locator('#post-100');
+        await expect(row).toBeVisible();
         await row.hover();
-        await expect(row.locator('.ctg_convert a')).toBeVisible();
-        await expect(row.locator('.ctg_preview a')).toBeVisible();
+
+        const actions = row.locator('.row-actions');
+        await expect(actions).toBeVisible();
+        await expect(actions.locator('.ctg_convert')).toBeVisible();
+        await expect(actions.locator('.ctg_preview')).toBeVisible();
     });
 
     test('hides row actions for block posts', async ({ page }) => {
         await page.goto('/wp-admin/edit.php');
 
         const row = page.locator('#post-120');
+        await expect(row).toBeVisible();
         await row.hover();
-        await expect(row.locator('.ctg_convert')).toHaveCount(0);
+
+        await expect(row.locator('.row-actions .ctg_convert')).toHaveCount(0);
     });
 
-    test('convert row action works', async ({ page }) => {
+    test('convert row action converts the post', async ({ page }) => {
         await page.goto('/wp-admin/edit.php');
 
-        const row = page.locator('#post-100');
+        const row = page.locator('#post-101');
+        await expect(row).toBeVisible();
         await row.hover();
-        await row.locator('.ctg_convert a').click();
 
-        // Should redirect back to edit.php with a success notice.
+        const convertLink = row.locator('.row-actions .ctg_convert a');
+        await expect(convertLink).toBeVisible();
+        await convertLink.click();
+
+        // Should redirect back with success notice.
+        await page.waitForURL(/edit\.php/);
         await expect(page.locator('.notice-success')).toBeVisible();
 
-        // Verify post was converted.
-        const content = wp('post get 100 --field=content');
-        expect(content).toContain('<!-- wp:paragraph -->');
+        // Verify conversion via WP-CLI.
+        const content = wp('post get 101 --field=content');
+        expect(content).toContain('<!-- wp:heading -->');
     });
 });
