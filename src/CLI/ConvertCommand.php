@@ -6,10 +6,12 @@ namespace Apermo\ClassicToGutenberg\CLI;
 
 use Apermo\ClassicToGutenberg\ContentConverter;
 use Apermo\ClassicToGutenberg\Migration\ClassicPostFinder;
+use Apermo\ClassicToGutenberg\Migration\MigrationResult;
 use Apermo\ClassicToGutenberg\Migration\MigrationRunner;
 use Apermo\ClassicToGutenberg\Permission;
 use WP_CLI;
 use WP_CLI\Utils;
+
 /**
  * WP-CLI command: classic-to-gutenberg convert.
  */
@@ -21,6 +23,17 @@ class ConvertCommand {
 	 * @var ContentConverter
 	 */
 	private ContentConverter $converter;
+
+	/**
+	 * Conversion statistics.
+	 *
+	 * @var array{converted: int, failed: int, locked: int}
+	 */
+	private array $stats = [
+		'converted' => 0,
+		'failed'    => 0,
+		'locked'    => 0,
+	];
 
 	/**
 	 * Create a new convert command.
@@ -83,17 +96,32 @@ class ConvertCommand {
 			WP_CLI::error( \sprintf( 'User "%s" does not have sufficient permissions.', $user->user_login ) );
 		}
 
+		// Disable output buffering for responsive CLI output.
+		while ( \ob_get_level() > 0 ) {
+			\ob_end_flush();
+		}
+
 		WP_CLI::log( \sprintf( 'Running as: %s (#%d)', $user->user_login, $user->ID ) );
 
 		$dry_run  = (bool) Utils\get_flag_value( $assoc_args, 'dry-run', false );
 		$post_ids = $this->parse_post_ids( $args );
 
 		if ( $post_ids !== [] ) {
-			$this->convert_by_ids( $post_ids, $dry_run );
-			return;
+			$this->run_conversion( $post_ids, $dry_run );
+		} else {
+			$this->run_query_conversion( $assoc_args, $dry_run );
 		}
 
-		$this->convert_by_query( $assoc_args, $dry_run );
+		$prefix = $dry_run ? 'Would convert' : 'Converted';
+		WP_CLI::success(
+			\sprintf(
+				'%s %d, failed %d, locked %d.',
+				$prefix,
+				$this->stats['converted'],
+				$this->stats['failed'],
+				$this->stats['locked'],
+			),
+		);
 	}
 
 	/**
@@ -124,46 +152,36 @@ class ConvertCommand {
 	}
 
 	/**
-	 * Convert specific posts by their IDs.
+	 * Run conversion on explicit post IDs with progress bar.
 	 *
 	 * @param int[] $post_ids Post IDs to convert.
 	 * @param bool  $dry_run  Whether to preview only.
 	 *
 	 * @return void
 	 */
-	private function convert_by_ids( array $post_ids, bool $dry_run ): void {
-		$runner = new MigrationRunner( $this->converter );
-		$mode   = $dry_run ? 'Dry run' : 'Converting';
+	private function run_conversion( array $post_ids, bool $dry_run ): void {
+		$total    = \count( $post_ids );
+		$runner   = new MigrationRunner( $this->converter );
+		$progress = Utils\make_progress_bar( $this->get_progress_label( $dry_run ), $total );
 
-		WP_CLI::log( \sprintf( '%s %d post(s)...', $mode, \count( $post_ids ) ) );
-
-		$results   = $runner->convert_batch( $post_ids, $dry_run );
-		$converted = 0;
-		$failed    = 0;
-
-		foreach ( $results as $result ) {
-			if ( $result->success ) {
-				$converted++;
-				WP_CLI::log( \sprintf( '  [OK] Post #%d', $result->post_id ) );
-			} else {
-				$failed++;
-				WP_CLI::warning( \sprintf( '  [FAIL] Post #%d: %s', $result->post_id, $result->error ) );
-			}
+		foreach ( $post_ids as $post_id ) {
+			$result = $runner->convert_post( $post_id, $dry_run );
+			$this->track_result( $result );
+			$progress->tick( 1, $this->get_tick_message( $total ) );
 		}
 
-		$prefix = $dry_run ? 'Would convert' : 'Converted';
-		WP_CLI::success( \sprintf( '%s %d post(s), %d failed.', $prefix, $converted, $failed ) );
+		$progress->finish();
 	}
 
 	/**
-	 * Convert posts found by query.
+	 * Run conversion on posts found by query with progress bar.
 	 *
 	 * @param array<string,string> $assoc_args Associative arguments.
 	 * @param bool                 $dry_run    Whether to preview only.
 	 *
 	 * @return void
 	 */
-	private function convert_by_query( array $assoc_args, bool $dry_run ): void {
+	private function run_query_conversion( array $assoc_args, bool $dry_run ): void {
 		$batch_size = (int) ( $assoc_args['batch-size'] ?? 50 );
 		$finder     = new ClassicPostFinder();
 		$runner     = new MigrationRunner( $this->converter );
@@ -176,16 +194,12 @@ class ConvertCommand {
 		$total = $finder->count( $query_args );
 
 		if ( $total === 0 ) {
-			WP_CLI::success( 'No classic posts found.' );
+			WP_CLI::log( 'No classic posts found.' );
 			return;
 		}
 
-		$mode = $dry_run ? 'Dry run' : 'Converting';
-		WP_CLI::log( \sprintf( '%s %d classic post(s)...', $mode, $total ) );
-
-		$offset    = 0;
-		$converted = 0;
-		$failed    = 0;
+		$progress = Utils\make_progress_bar( $this->get_progress_label( $dry_run ), $total );
+		$offset   = 0;
 
 		while ( true ) {
 			$query_args['offset'] = $offset;
@@ -195,22 +209,66 @@ class ConvertCommand {
 				break;
 			}
 
-			$results = $runner->convert_batch( $post_ids, $dry_run );
-
-			foreach ( $results as $result ) {
-				if ( $result->success ) {
-					$converted++;
-					WP_CLI::log( \sprintf( '  [OK] Post #%d', $result->post_id ) );
-				} else {
-					$failed++;
-					WP_CLI::warning( \sprintf( '  [FAIL] Post #%d: %s', $result->post_id, $result->error ) );
-				}
+			foreach ( $post_ids as $post_id ) {
+				$result = $runner->convert_post( $post_id, $dry_run );
+				$this->track_result( $result );
+				$progress->tick( 1, $this->get_tick_message( $total ) );
 			}
 
 			$offset += $batch_size;
 		}
 
-		$prefix = $dry_run ? 'Would convert' : 'Converted';
-		WP_CLI::success( \sprintf( '%s %d post(s), %d failed.', $prefix, $converted, $failed ) );
+		$progress->finish();
+	}
+
+	/**
+	 * Track a migration result in statistics.
+	 *
+	 * @param \Apermo\ClassicToGutenberg\Migration\MigrationResult $result The result.
+	 *
+	 * @return void
+	 */
+	private function track_result( MigrationResult $result ): void {
+		if ( $result->success ) {
+			$this->stats['converted']++;
+			return;
+		}
+
+		if ( \str_contains( $result->error, 'locked' ) ) {
+			$this->stats['locked']++;
+		} else {
+			$this->stats['failed']++;
+		}
+	}
+
+	/**
+	 * Get progress bar label.
+	 *
+	 * @param bool $dry_run Whether this is a dry run.
+	 *
+	 * @return string
+	 */
+	private function get_progress_label( bool $dry_run ): string {
+		return $dry_run ? 'Dry run' : 'Converting';
+	}
+
+	/**
+	 * Get tick message with current statistics.
+	 *
+	 * @param int $total Total number of posts.
+	 *
+	 * @return string
+	 */
+	private function get_tick_message( int $total ): string {
+		$processed = $this->stats['converted'] + $this->stats['failed'] + $this->stats['locked'];
+
+		return \sprintf(
+			'%d/%d — OK %d / Failed %d / Locked %d',
+			$processed,
+			$total,
+			$this->stats['converted'],
+			$this->stats['failed'],
+			$this->stats['locked'],
+		);
 	}
 }
