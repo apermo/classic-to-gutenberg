@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Plugin lifecycle methods: `activate()`, `deactivate()`, `boot()`
-- DDEV custom `wp` command wrapper for `php` project type
 - GitHub issue templates (bug report, feature request)
 - GitHub pull request template
 - Repository marked as GitHub template
@@ -18,8 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Standardize plugin entry file to `plugin.php`
+- Replace global constants with class members in Plugin class
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-03-15
 
 ### Added
 
