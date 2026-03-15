@@ -196,7 +196,9 @@ class TopLevelSplitter {
 	private function extract_element( string $html, int $offset, string $tag_name ): string {
 		$length = \strlen( $html );
 
-		\preg_match( '/\G<' . $tag_name . '(?:\s[^>]*)?>/', $html, $open_match, 0, $offset );
+		if ( ! \preg_match( '/\G<' . $tag_name . '(?:\s[^>]*)?>/i', $html, $open_match, 0, $offset ) ) {
+			return $this->extract_until_next_block( $html, $offset );
+		}
 		$search_pos   = $offset + \strlen( $open_match[0] );
 		$depth        = 1;
 		$open_pattern = '/<' . $tag_name . '(?:\s[^>]*)?>|<\/' . $tag_name . '\s*>/i';
@@ -243,7 +245,9 @@ class TopLevelSplitter {
 		$tags_pattern = \implode( '|', self::BLOCK_TAGS );
 		$pattern      = '/(?<=\n|\s)<(?:' . $tags_pattern . ')(?:\s[^>]*)?(?:\/>|>)/i';
 
-		\preg_match( '/\G<\w+(?:\s[^>]*)?>/', $html, $open_match, 0, $offset );
+		if ( ! \preg_match( '/\G<\w+(?:\s[^>]*)?>/i', $html, $open_match, 0, $offset ) ) {
+			return \rtrim( \substr( $html, $offset ) );
+		}
 		$after_open = $offset + \strlen( $open_match[0] );
 
 		if ( \preg_match( $pattern, $html, $match, \PREG_OFFSET_CAPTURE, $after_open ) ) {

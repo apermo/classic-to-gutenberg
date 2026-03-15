@@ -24,7 +24,9 @@ class QuoteConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	public function convert( string $html ): string {
-		\preg_match( '/<blockquote(?:\s[^>]*)?>(.*)<\/blockquote>/s', $html, $match );
+		if ( ! \preg_match( '/<blockquote(?:\s[^>]*)?>(.*)<\/blockquote>/si', $html, $match ) ) {
+			return $this->wrap_block( 'html', $html );
+		}
 		$inner = \trim( $match[1] );
 
 		$converted_inner = $this->convert_inner_content( $inner );
