@@ -108,7 +108,7 @@ class ConvertCommand {
 		}
 
 		if ( $post_ids === [] ) {
-			WP_CLI::success( 'No classic posts without block markup found.' );
+			WP_CLI::success( 'No posts without block markup found.' );
 			return;
 		}
 
