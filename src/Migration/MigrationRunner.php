@@ -30,6 +30,8 @@ class MigrationRunner {
 	/**
 	 * Convert a single post.
 	 *
+	 * Checks post lock, acquires lock during conversion, and releases after.
+	 *
 	 * @param int  $post_id The post ID.
 	 * @param bool $dry_run If true, return the result without saving.
 	 *
@@ -42,6 +44,10 @@ class MigrationRunner {
 			return new MigrationResult( $post_id, false, '', '', 'Post not found.' );
 		}
 
+		if ( ! $dry_run && wp_check_post_lock( $post_id ) ) {
+			return new MigrationResult( $post_id, false, '', '', 'Post is locked by another user.' );
+		}
+
 		$original  = $post->post_content;
 		$converted = $this->converter->convert( $original );
 
@@ -49,7 +55,8 @@ class MigrationRunner {
 			return new MigrationResult( $post_id, true, $original, $converted );
 		}
 
-		// Save a revision with the classic content before converting.
+		wp_set_post_lock( $post_id );
+
 		$revision_id = wp_save_post_revision( $post_id );
 
 		$updated = wp_update_post(
@@ -60,11 +67,13 @@ class MigrationRunner {
 			true,
 		);
 
+		// Unlock the post. There is no dedicated unlock function.
+		update_post_meta( $post_id, '_edit_lock', false );
+
 		if ( is_wp_error( $updated ) ) {
 			return new MigrationResult( $post_id, false, $original, $converted, $updated->get_error_message() );
 		}
 
-		// Store the pre-conversion revision ID for rollback.
 		if ( \is_int( $revision_id ) && $revision_id > 0 ) {
 			update_post_meta( $post_id, '_ctg_revision_id', $revision_id );
 		}

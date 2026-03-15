@@ -73,6 +73,18 @@ class ConvertCommand {
 	 * @return void
 	 */
 	public function execute( array $args, array $assoc_args ): void {
+		$user = wp_get_current_user();
+
+		if ( ! $user->exists() ) {
+			WP_CLI::error( 'No user set. Use --user=<id|login|email> to specify which user runs the conversion.' );
+		}
+
+		if ( ! user_can( $user, 'manage_options' ) ) {
+			WP_CLI::error( \sprintf( 'User "%s" is not an administrator.', $user->user_login ) );
+		}
+
+		WP_CLI::log( \sprintf( 'Running as: %s (#%d)', $user->user_login, $user->ID ) );
+
 		$dry_run  = (bool) Utils\get_flag_value( $assoc_args, 'dry-run', false );
 		$post_ids = $this->parse_post_ids( $args );
 
