@@ -33,12 +33,9 @@
                 <element value="plugin_name"/>
             </property>
         </properties>
+        <!-- Test bootstrap uses standard WP test globals, not plugin globals. -->
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
     </rule>
 
     <config name="minimum_wp_version" value="6.2"/>
-
-    <!-- Test bootstrap uses standard WP test globals, not plugin globals. -->
-    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
-        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
-    </rule>
 </ruleset>
