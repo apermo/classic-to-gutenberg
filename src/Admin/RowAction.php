@@ -61,13 +61,13 @@ class RowAction {
 			'ctg_preview_' . $post->ID,
 		);
 
-		$actions['ctg_convert'] = sprintf(
+		$actions['ctg_convert'] = \sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( $convert_url ),
 			esc_html__( 'Convert to Blocks', 'classic-to-gutenberg' ),
 		);
 
-		$actions['ctg_preview'] = sprintf(
+		$actions['ctg_preview'] = \sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( $preview_url ),
 			esc_html__( 'Preview Blocks', 'classic-to-gutenberg' ),
@@ -147,6 +147,6 @@ class RowAction {
 	 * @return bool
 	 */
 	private function has_blocks( WP_Post $post ): bool {
-		return str_contains( $post->post_content, '<!-- wp:' );
+		return \str_contains( $post->post_content, '<!-- wp:' );
 	}
 }

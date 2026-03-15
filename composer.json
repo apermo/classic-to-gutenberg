@@ -2,6 +2,7 @@
     "name": "apermo/classic-to-gutenberg",
     "description": "Batch migration from classic editor content to Gutenberg blocks.",
     "type": "wordpress-plugin",
+    "keywords": ["wordpress", "gutenberg", "migration", "blocks", "classic-editor"],
     "license": "GPL-2.0-or-later",
     "authors": [
         {
@@ -9,6 +10,10 @@
             "email": "info@apermo.de"
         }
     ],
+    "support": {
+        "issues": "https://github.com/apermo/classic-to-gutenberg/issues",
+        "source": "https://github.com/apermo/classic-to-gutenberg"
+    },
     "require": {
         "php": ">=8.2"
     },

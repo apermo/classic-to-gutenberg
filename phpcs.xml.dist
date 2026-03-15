@@ -1,11 +1,36 @@
 <?xml version="1.0"?>
-<ruleset name="classic-to-gutenberg">
-    <description>Coding standards for classic-to-gutenberg.</description>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="classic-to-gutenberg"
+    xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd">
 
-    <file>src</file>
-    <file>tests</file>
-    <file>plugin.php</file>
-    <file>uninstall.php</file>
+    <description>PHPCS configuration for classic-to-gutenberg.</description>
+
+    <file>.</file>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>node_modules/*</exclude-pattern>
+    <exclude-pattern>.ddev/*</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
 
     <rule ref="Apermo"/>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="classic-to-gutenberg"/>
+            </property>
+        </properties>
+    </rule>
+
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="Apermo\ClassicToGutenberg"/>
+                <element value="classic_to_gutenberg"/>
+            </property>
+        </properties>
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+    </rule>
+
+    <config name="minimum_wp_version" value="6.2"/>
 </ruleset>

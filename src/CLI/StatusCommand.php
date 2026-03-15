@@ -44,7 +44,7 @@ class StatusCommand {
 		$query_args = [];
 
 		if ( isset( $assoc_args['post-type'] ) ) {
-			$query_args['post_type'] = explode( ',', $assoc_args['post-type'] );
+			$query_args['post_type'] = \explode( ',', $assoc_args['post-type'] );
 		}
 
 		$total = $finder->count( $query_args );
@@ -54,6 +54,6 @@ class StatusCommand {
 			return;
 		}
 
-		WP_CLI::log( sprintf( 'Found %d classic post(s) without block markup.', $total ) );
+		WP_CLI::log( \sprintf( 'Found %d classic post(s) without block markup.', $total ) );
 	}
 }

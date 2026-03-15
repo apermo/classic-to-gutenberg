@@ -32,16 +32,16 @@ class AdminNotice {
 		delete_transient( 'ctg_notice_' . $user_id );
 
 		if ( $notice === 'converted' ) {
-			printf(
+			\printf(
 				'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
 				esc_html__( 'Post successfully converted to blocks.', 'classic-to-gutenberg' ),
 			);
 			return;
 		}
 
-		if ( str_starts_with( (string) $notice, 'error:' ) ) {
-			$error_message = substr( (string) $notice, 6 );
-			printf(
+		if ( \str_starts_with( (string) $notice, 'error:' ) ) {
+			$error_message = \substr( (string) $notice, 6 );
+			\printf(
 				'<div class="notice notice-error is-dismissible"><p>%s %s</p></div>',
 				esc_html__( 'Conversion failed:', 'classic-to-gutenberg' ),
 				esc_html( $error_message ),

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Converter;
 
+use WP_HTML_Tag_Processor;
+
 /**
  * Converts <ul>/<ol> tags to core/list blocks with nested list-item inner blocks.
  */
@@ -30,7 +32,7 @@ class ListConverter extends AbstractBlockConverter {
 		}
 
 		$close_tag = '</' . $tag_name . '>';
-		return stripos( $html, $close_tag ) !== false;
+		return \stripos( $html, $close_tag ) !== false;
 	}
 
 	/**
@@ -41,7 +43,7 @@ class ListConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	public function convert( string $html ): string {
-		$is_ordered = (bool) preg_match( '/^\s*<ol/i', $html );
+		$is_ordered = (bool) \preg_match( '/^\s*<ol/i', $html );
 		$attrs      = $is_ordered ? [ 'ordered' => true ] : [];
 
 		$inner = $this->convert_list( $html, $is_ordered );
@@ -60,7 +62,7 @@ class ListConverter extends AbstractBlockConverter {
 	private function convert_list( string $html, bool $is_ordered ): string {
 		$tag_name = $is_ordered ? 'ol' : 'ul';
 
-		$processor = new \WP_HTML_Tag_Processor( $html );
+		$processor = new WP_HTML_Tag_Processor( $html );
 		if ( $processor->next_tag( [ 'tag_name' => $tag_name ] ) ) {
 			$existing = $processor->get_attribute( 'class' );
 			$classes  = $existing !== null ? $existing . ' wp-block-list' : 'wp-block-list';
@@ -79,8 +81,8 @@ class ListConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function wrap_list_items( string $html ): string {
-		preg_match( '/^(<(?:ul|ol)(?:\s[^>]*)?>)\s*/i', $html, $open_match );
-		preg_match( '/\s*(<\/(?:ul|ol)\s*>)\s*$/i', $html, $close_match );
+		\preg_match( '/^(<(?:ul|ol)(?:\s[^>]*)?>)\s*/i', $html, $open_match );
+		\preg_match( '/\s*(<\/(?:ul|ol)\s*>)\s*$/i', $html, $close_match );
 
 		$open_tag  = $open_match[1];
 		$close_tag = $close_match[1];
@@ -92,7 +94,7 @@ class ListConverter extends AbstractBlockConverter {
 			$items[] = $this->convert_list_item_content( $content );
 		}
 
-		return $open_tag . implode( "\n\n", $items ) . $close_tag;
+		return $open_tag . \implode( "\n\n", $items ) . $close_tag;
 	}
 
 	/**
@@ -105,19 +107,19 @@ class ListConverter extends AbstractBlockConverter {
 	private function extract_list_items( string $html ): array {
 		$items  = [];
 		$offset = 0;
-		$length = strlen( $html );
+		$length = \strlen( $html );
 
 		while ( $offset < $length ) {
-			if ( ! preg_match( '/<li(?:\s[^>]*)?>/', $html, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
+			if ( ! \preg_match( '/<li(?:\s[^>]*)?>/', $html, $match, \PREG_OFFSET_CAPTURE, $offset ) ) {
 				break;
 			}
 
 			$li_start      = $match[0][1];
-			$content_start = $li_start + strlen( $match[0][0] );
+			$content_start = $li_start + \strlen( $match[0][0] );
 			$content_end   = $this->find_closing_li( $html, $content_start );
 
-			$items[] = substr( $html, $content_start, $content_end - $content_start );
-			$offset  = $content_end + strlen( '</li>' );
+			$items[] = \substr( $html, $content_start, $content_end - $content_start );
+			$offset  = $content_end + \strlen( '</li>' );
 		}
 
 		return $items;
@@ -135,26 +137,26 @@ class ListConverter extends AbstractBlockConverter {
 	 */
 	private function find_closing_li( string $html, int $offset ): int {
 		$depth  = 1;
-		$length = strlen( $html );
+		$length = \strlen( $html );
 
 		while ( $offset < $length && $depth > 0 ) {
-			if ( ! preg_match( '/<li(?:\s[^>]*)?>|<\/li\s*>/i', $html, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
+			if ( ! \preg_match( '/<li(?:\s[^>]*)?>|<\/li\s*>/i', $html, $match, \PREG_OFFSET_CAPTURE, $offset ) ) {
 				return $length;
 			}
 
 			$match_str    = $match[0][0];
 			$match_offset = $match[0][1];
 
-			if ( stripos( $match_str, '</li' ) === 0 ) {
-				--$depth;
+			if ( \stripos( $match_str, '</li' ) === 0 ) {
+				$depth--;
 				if ( $depth === 0 ) {
 					return $match_offset;
 				}
 			} else {
-				++$depth;
+				$depth++;
 			}
 
-			$offset = $match_offset + strlen( $match_str );
+			$offset = $match_offset + \strlen( $match_str );
 		}
 
 		return $length;
@@ -168,7 +170,7 @@ class ListConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function convert_list_item_content( string $content ): string {
-		$content = (string) preg_replace_callback(
+		$content = (string) \preg_replace_callback(
 			'/\s*<(ul|ol)(?:\s[^>]*)?>[\s\S]*?<\/\1\s*>\s*/i',
 			[ $this, 'convert_nested_list' ],
 			$content,
@@ -185,10 +187,10 @@ class ListConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function convert_nested_list( array $matches ): string {
-		$nested_tag = strtolower( $matches[1] );
+		$nested_tag = \strtolower( $matches[1] );
 		$is_ordered = $nested_tag === 'ol';
 		$attrs      = $is_ordered ? [ 'ordered' => true ] : [];
-		$inner      = $this->convert_list( trim( $matches[0] ), $is_ordered );
+		$inner      = $this->convert_list( \trim( $matches[0] ), $is_ordered );
 
 		return $this->wrap_block( 'list', $inner, $attrs );
 	}

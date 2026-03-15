@@ -18,7 +18,7 @@ abstract class AbstractBlockConverter implements BlockConverterInterface {
 	 * @return bool
 	 */
 	public function can_convert( string $tag_name, string $html ): bool {
-		return in_array( $tag_name, $this->get_supported_tags(), true );
+		return \in_array( $tag_name, $this->get_supported_tags(), true );
 	}
 
 	/**
@@ -31,7 +31,7 @@ abstract class AbstractBlockConverter implements BlockConverterInterface {
 	 * @return string
 	 */
 	protected function wrap_block( string $block_name, string $content, array $attrs = [] ): string {
-		$attrs_string = $attrs !== [] ? ' ' . wp_json_encode( $attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) : '';
+		$attrs_string = $attrs !== [] ? ' ' . wp_json_encode( $attrs, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE ) : '';
 
 		return "<!-- wp:{$block_name}{$attrs_string} -->\n{$content}\n<!-- /wp:{$block_name} -->";
 	}
@@ -45,7 +45,7 @@ abstract class AbstractBlockConverter implements BlockConverterInterface {
 	 * @return string
 	 */
 	protected function self_closing_block( string $block_name, array $attrs = [] ): string {
-		$attrs_string = $attrs !== [] ? ' ' . wp_json_encode( $attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) : '';
+		$attrs_string = $attrs !== [] ? ' ' . wp_json_encode( $attrs, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE ) : '';
 
 		return "<!-- wp:{$block_name}{$attrs_string} /-->";
 	}

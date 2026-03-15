@@ -35,7 +35,7 @@ class ImageConverter extends AbstractBlockConverter {
 		}
 
 		if ( $tag_name === 'figure' ) {
-			return (bool) preg_match( '/<img\s/i', $html );
+			return (bool) \preg_match( '/<img\s/i', $html );
 		}
 
 		return true;
@@ -49,11 +49,11 @@ class ImageConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	public function convert( string $html ): string {
-		if ( preg_match( '/^\s*<figure/i', $html ) ) {
+		if ( \preg_match( '/^\s*<figure/i', $html ) ) {
 			return $this->convert_figure( $html );
 		}
 
-		if ( preg_match( '/^\s*<a\s/i', $html ) ) {
+		if ( \preg_match( '/^\s*<a\s/i', $html ) ) {
 			return $this->convert_linked_image( $html );
 		}
 
@@ -84,13 +84,13 @@ class ImageConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function convert_linked_image( string $html ): string {
-		preg_match( '/<img\s[^>]*\/?>/i', $html, $img_match );
+		\preg_match( '/<img\s[^>]*\/?>/i', $html, $img_match );
 		$attrs                    = $this->extract_image_attrs( $img_match[0] );
 		$attrs['linkDestination'] = 'custom';
 
 		$clean_img = $this->build_clean_img( $img_match[0] );
 
-		preg_match( '/<a\s[^>]*>/i', $html, $link_match );
+		\preg_match( '/<a\s[^>]*>/i', $html, $link_match );
 		$link_open = $link_match[0];
 
 		$figure = '<figure class="wp-block-image' . $this->align_class( $attrs ) . '">'
@@ -107,11 +107,11 @@ class ImageConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function convert_figure( string $html ): string {
-		preg_match( '/<img\s[^>]*\/?>/i', $html, $img_match );
+		\preg_match( '/<img\s[^>]*\/?>/i', $html, $img_match );
 		$img_attrs = $this->extract_image_attrs( $img_match[0] );
 
 		$align = '';
-		if ( preg_match( '/class="[^"]*align(left|right|center|none)[^"]*"/', $html, $align_match ) ) {
+		if ( \preg_match( '/class="[^"]*align(left|right|center|none)[^"]*"/', $html, $align_match ) ) {
 			$align = $align_match[1];
 		}
 
@@ -120,7 +120,7 @@ class ImageConverter extends AbstractBlockConverter {
 		$clean_img = $this->build_clean_img( $img_match[0] );
 
 		$caption = '';
-		if ( preg_match( '/<figcaption[^>]*>(.*?)<\/figcaption>/s', $html, $cap_match ) ) {
+		if ( \preg_match( '/<figcaption[^>]*>(.*?)<\/figcaption>/s', $html, $cap_match ) ) {
 			$caption = '<figcaption class="wp-element-caption">' . $cap_match[1] . '</figcaption>';
 		}
 
@@ -172,18 +172,18 @@ class ImageConverter extends AbstractBlockConverter {
 	private function extract_image_attrs( string $img_html ): array {
 		$attrs = [];
 
-		if ( preg_match( '/wp-image-(\d+)/', $img_html, $match ) ) {
+		if ( \preg_match( '/wp-image-(\d+)/', $img_html, $match ) ) {
 			$attrs['id'] = (int) $match[1];
 		}
 
-		if ( preg_match( '/\balign(left|right|center|none)\b/', $img_html, $match ) ) {
+		if ( \preg_match( '/\balign(left|right|center|none)\b/', $img_html, $match ) ) {
 			$attrs['align'] = $match[1];
 		}
 
-		if ( preg_match( '/\bwidth=["\'](\d+)["\']/', $img_html, $match ) ) {
+		if ( \preg_match( '/\bwidth=["\'](\d+)["\']/', $img_html, $match ) ) {
 			$attrs['width'] = (int) $match[1];
 		}
-		if ( preg_match( '/\bheight=["\'](\d+)["\']/', $img_html, $match ) ) {
+		if ( \preg_match( '/\bheight=["\'](\d+)["\']/', $img_html, $match ) ) {
 			$attrs['height'] = (int) $match[1];
 		}
 
@@ -198,10 +198,10 @@ class ImageConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function build_clean_img( string $img_html ): string {
-		$clean = (string) preg_replace( '/\s*\balign(?:left|right|center|none)\b/', '', $img_html );
-		$clean = (string) preg_replace( '/\s*\/?\s*>$/', '/>', $clean );
-		$clean = (string) preg_replace( '/class="(\s+)/', 'class="', $clean );
-		$clean = (string) preg_replace( '/\s+"/', '"', $clean );
+		$clean = (string) \preg_replace( '/\s*\balign(?:left|right|center|none)\b/', '', $img_html );
+		$clean = (string) \preg_replace( '/\s*\/?\s*>$/', '/>', $clean );
+		$clean = (string) \preg_replace( '/class="(\s+)/', 'class="', $clean );
+		$clean = (string) \preg_replace( '/\s+"/', '"', $clean );
 
 		return $clean;
 	}

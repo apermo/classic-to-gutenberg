@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Converter;
 
+use WP_HTML_Tag_Processor;
+
 /**
  * Converts <table> tags to core/table blocks.
  */
@@ -29,7 +31,7 @@ class TableConverter extends AbstractBlockConverter {
 			return false;
 		}
 
-		return (bool) preg_match( '/<thead/i', $html ) && (bool) preg_match( '/<tbody/i', $html );
+		return (bool) \preg_match( '/<thead/i', $html ) && (bool) \preg_match( '/<tbody/i', $html );
 	}
 
 	/**
@@ -42,7 +44,7 @@ class TableConverter extends AbstractBlockConverter {
 	public function convert( string $html ): string {
 		$collapsed = $this->collapse_whitespace( $html );
 
-		$processor = new \WP_HTML_Tag_Processor( $collapsed );
+		$processor = new WP_HTML_Tag_Processor( $collapsed );
 		if ( $processor->next_tag( [ 'tag_name' => 'table' ] ) ) {
 			$existing = $processor->get_attribute( 'class' );
 			$classes  = $existing !== null ? $existing . ' has-fixed-layout' : 'has-fixed-layout';
@@ -63,6 +65,6 @@ class TableConverter extends AbstractBlockConverter {
 	 * @return string
 	 */
 	private function collapse_whitespace( string $html ): string {
-		return (string) preg_replace( '/>\s+</', '><', $html );
+		return (string) \preg_replace( '/>\s+</', '><', $html );
 	}
 }

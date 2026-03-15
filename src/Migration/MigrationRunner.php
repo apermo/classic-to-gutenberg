@@ -65,7 +65,7 @@ class MigrationRunner {
 		}
 
 		// Store the pre-conversion revision ID for rollback.
-		if ( is_int( $revision_id ) && $revision_id > 0 ) {
+		if ( \is_int( $revision_id ) && $revision_id > 0 ) {
 			update_post_meta( $post_id, '_ctg_revision_id', $revision_id );
 		}
 

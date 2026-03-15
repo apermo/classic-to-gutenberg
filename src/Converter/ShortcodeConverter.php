@@ -73,7 +73,7 @@ class ShortcodeConverter extends AbstractBlockConverter {
 	 * @return string The tag name, or empty string if not found.
 	 */
 	private function extract_shortcode_tag( string $shortcode ): string {
-		if ( preg_match( '/\[(\w[\w-]*)/', $shortcode, $match ) ) {
+		if ( \preg_match( '/\[(\w[\w-]*)/', $shortcode, $match ) ) {
 			return $match[1];
 		}
 		return '';
