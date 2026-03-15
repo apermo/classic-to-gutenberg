@@ -21,9 +21,15 @@
         </properties>
     </rule>
 
+    <!--
+        Project prefix for global functions, hooks, constants,
+        and namespace roots. E.g. prefix "Plugin_Name" allows
+        namespace Plugin_Name\Admin but flags Other\Admin.
+    -->
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <properties>
             <property name="prefixes" type="array">
+                <element value="Plugin_Name"/>
                 <element value="plugin_name"/>
             </property>
         </properties>
