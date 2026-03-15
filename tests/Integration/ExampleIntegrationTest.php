@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Plugin_Name\Tests\Integration;
+namespace Apermo\ClassicToGutenberg\Tests\Integration;
 
 use WP_UnitTestCase;
 
@@ -26,12 +26,12 @@ class ExampleIntegrationTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_project_is_active(): void {
-		$plugin_file = dirname( __DIR__, 2 ) . '/plugin-name.php';
+		$plugin_file = dirname( __DIR__, 2 ) . '/plugin.php';
 
 		if ( file_exists( $plugin_file ) ) {
 			$this->assertTrue(
-				defined( 'PLUGIN_NAME_VERSION' ),
-				'Plugin constant PLUGIN_NAME_VERSION should be defined.',
+				defined( 'CLASSIC_TO_GUTENBERG_VERSION' ),
+				'Plugin constant CLASSIC_TO_GUTENBERG_VERSION should be defined.',
 			);
 		} else {
 			$this->assertNotFalse(

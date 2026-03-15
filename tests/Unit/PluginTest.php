@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Plugin_Name\Tests\Unit;
+namespace Apermo\ClassicToGutenberg\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Plugin_Name\Plugin;
+use Apermo\ClassicToGutenberg\Plugin;
 
 /**
  * Tests for the Plugin class.
@@ -19,5 +19,14 @@ class PluginTest extends TestCase {
 	 */
 	public function test_init_method_exists(): void {
 		$this->assertTrue( method_exists( Plugin::class, 'init' ) );
+	}
+
+	/**
+	 * Verify the create_factory method exists.
+	 *
+	 * @return void
+	 */
+	public function test_create_factory_method_exists(): void {
+		$this->assertTrue( method_exists( Plugin::class, 'create_factory' ) );
 	}
 }
