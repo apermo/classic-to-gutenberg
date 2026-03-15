@@ -1,7 +1,0 @@
-#!/bin/bash
-
-## Description: Run WordPress CLI commands
-## Usage: wp [flags] [args]
-## Example: ddev wp plugin list
-
-wp "$@"
