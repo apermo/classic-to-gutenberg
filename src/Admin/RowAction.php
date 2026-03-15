@@ -250,13 +250,92 @@ class RowAction {
 			wp_die( esc_html( $result->error ) );
 		}
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- block markup preview
-		echo '<html><head><title>Block Preview — Post #' . esc_html( (string) $post_id ) . '</title></head><body>';
-		echo '<h1>' . esc_html__( 'Block Preview', 'classic-to-gutenberg' ) . '</h1>';
-		echo '<pre style="white-space: pre-wrap; word-wrap: break-word;">';
-		echo esc_html( $result->converted );
-		echo '</pre></body></html>';
+		$post  = get_post( $post_id );
+		$title = $post !== null ? get_the_title( $post ) : '#' . $post_id;
+
+		$this->render_preview_page( $title, $result->original, $result->converted );
 		exit();
+	}
+
+	/**
+	 * Render the side-by-side preview page.
+	 *
+	 * @param string $title     The post title.
+	 * @param string $original  The original classic content.
+	 * @param string $converted The converted block markup.
+	 *
+	 * @return void
+	 *
+	 * phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength -- HTML template, splitting hurts readability
+	 */
+	private function render_preview_page( string $title, string $original, string $converted ): void {
+		$label_original  = esc_html__( 'Original (Classic)', 'classic-to-gutenberg' );
+		$label_converted = esc_html__( 'Converted (Blocks)', 'classic-to-gutenberg' );
+		$label_rendered  = esc_html__( 'Rendered', 'classic-to-gutenberg' );
+		$label_markup    = esc_html__( 'Markup', 'classic-to-gutenberg' );
+
+		// Apply wpautop to original for fair rendered comparison.
+		$original_rendered = wpautop( $original );
+
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- controlled preview output
+		?>
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<meta charset="utf-8">
+			<title><?php echo esc_html( $title ); ?> — <?php esc_html_e( 'Block Preview', 'classic-to-gutenberg' ); ?></title>
+			<style>
+				* { box-sizing: border-box; margin: 0; padding: 0; }
+				body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif; padding: 20px; background: #f0f0f1; }
+				h1 { margin-bottom: 20px; font-size: 1.4em; color: #1d2327; }
+				.ctg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+				.ctg-panel { background: #fff; border: 1px solid #c3c4c7; border-radius: 4px; overflow: hidden; }
+				.ctg-panel-header { background: #f6f7f7; border-bottom: 1px solid #c3c4c7; padding: 10px 16px; display: flex; justify-content: space-between; }
+				.ctg-panel-header strong { color: #1d2327; }
+				.ctg-panel-header span { color: #646970; font-size: 0.9em; }
+				.ctg-panel-body { padding: 16px; }
+				.ctg-panel-body.ctg-rendered { font-size: 16px; line-height: 1.6; color: #1d2327; }
+				.ctg-panel-body.ctg-rendered img { max-width: 100%; height: auto; }
+				.ctg-panel-body.ctg-markup { background: #f6f7f7; }
+				.ctg-panel-body pre { white-space: pre-wrap; word-wrap: break-word; font-family: Menlo, Consolas, Monaco, monospace; font-size: 12px; line-height: 1.5; color: #2c3338; }
+				.ctg-section { margin-bottom: 24px; }
+				.ctg-section-title { font-size: 1.1em; color: #646970; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+			</style>
+		</head>
+		<body>
+			<h1><?php echo esc_html( $title ); ?></h1>
+
+			<div class="ctg-section">
+				<div class="ctg-section-title"><?php echo esc_html( $label_rendered ); ?></div>
+				<div class="ctg-grid">
+					<div class="ctg-panel">
+						<div class="ctg-panel-header"><strong><?php echo esc_html( $label_original ); ?></strong></div>
+						<div class="ctg-panel-body ctg-rendered"><?php echo $original_rendered; ?></div>
+					</div>
+					<div class="ctg-panel">
+						<div class="ctg-panel-header"><strong><?php echo esc_html( $label_converted ); ?></strong></div>
+						<div class="ctg-panel-body ctg-rendered"><?php echo $converted; ?></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="ctg-section">
+				<div class="ctg-section-title"><?php echo esc_html( $label_markup ); ?></div>
+				<div class="ctg-grid">
+					<div class="ctg-panel">
+						<div class="ctg-panel-header"><strong><?php echo esc_html( $label_original ); ?></strong></div>
+						<div class="ctg-panel-body ctg-markup"><pre><?php echo esc_html( $original ); ?></pre></div>
+					</div>
+					<div class="ctg-panel">
+						<div class="ctg-panel-header"><strong><?php echo esc_html( $label_converted ); ?></strong></div>
+						<div class="ctg-panel-body ctg-markup"><pre><?php echo esc_html( $converted ); ?></pre></div>
+					</div>
+				</div>
+			</div>
+		</body>
+		</html>
+		<?php
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
