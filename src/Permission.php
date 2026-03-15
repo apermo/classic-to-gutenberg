@@ -35,7 +35,7 @@ class Permission {
 		/**
 		 * Filter whether a user can convert posts to blocks.
 		 *
-		 * @since 0.2.1
+		 * @since 0.3.0
 		 *
 		 * @param bool    $can_convert Whether the user has permission.
 		 * @param WP_User $user        The user being checked.

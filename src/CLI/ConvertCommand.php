@@ -162,7 +162,7 @@ class ConvertCommand {
 	 */
 	private function find_classic_posts( array $assoc_args ): array {
 		$finder     = new ClassicPostFinder();
-		$query_args = [ 'limit' => 0 ];
+		$query_args = [];
 
 		if ( isset( $assoc_args['post-type'] ) ) {
 			$query_args['post_type'] = \explode( ',', $assoc_args['post-type'] );
@@ -206,7 +206,7 @@ class ConvertCommand {
 			return;
 		}
 
-		if ( \str_contains( $result->error, 'locked' ) ) {
+		if ( $result->error_code === MigrationResult::ERROR_LOCKED ) {
 			$this->stats['locked']++;
 		} else {
 			$this->stats['failed']++;

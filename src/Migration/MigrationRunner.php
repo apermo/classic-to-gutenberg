@@ -41,11 +41,11 @@ class MigrationRunner {
 		$post = get_post( $post_id );
 
 		if ( $post === null ) {
-			return new MigrationResult( $post_id, false, '', '', 'Post not found.' );
+			return new MigrationResult( $post_id, false, '', '', 'Post not found.', MigrationResult::ERROR_NOT_FOUND );
 		}
 
 		if ( ! $dry_run && wp_check_post_lock( $post_id ) ) {
-			return new MigrationResult( $post_id, false, '', '', 'Post is locked by another user.' );
+			return new MigrationResult( $post_id, false, '', '', 'Post is locked by another user.', MigrationResult::ERROR_LOCKED );
 		}
 
 		$original  = $post->post_content;
@@ -71,7 +71,7 @@ class MigrationRunner {
 		delete_post_meta( $post_id, '_edit_lock' );
 
 		if ( is_wp_error( $updated ) ) {
-			return new MigrationResult( $post_id, false, $original, $converted, $updated->get_error_message() );
+			return new MigrationResult( $post_id, false, $original, $converted, $updated->get_error_message(), MigrationResult::ERROR_UPDATE_FAILED );
 		}
 
 		if ( \is_int( $revision_id ) && $revision_id > 0 ) {
