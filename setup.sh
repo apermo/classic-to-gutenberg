@@ -101,10 +101,13 @@ replace_in_files "use Plugin_Name\\\\" "use ${NAMESPACE_SED}\\\\" -name '*.php'
 # 2. Namespace in composer.json
 sedi "s|Plugin_Name\\\\\\\\|${NAMESPACE_JSON}\\\\\\\\|g" composer.json
 
-# 3. Composer package name
+# 3. Namespace prefix in phpcs.xml.dist (must use full namespace, not PascalCase)
+sedi "s|<element value=\"Plugin_Name\"/>|<element value=\"${NAMESPACE_SED}\"/>|" phpcs.xml.dist
+
+# 4. Composer package name
 sedi "s|apermo/plugin-name|${COMPOSER_NAME}|g" composer.json
 
-# 4. Bulk placeholder replacements (all files)
+# 5. Bulk placeholder replacements (all files)
 replace_in_files "PLUGIN_NAME" "$UPPER_SNAKE"
 replace_in_files "Plugin_Name" "$PASCAL_UNDER"
 replace_in_files "plugin_name" "$SNAKE_CASE"
