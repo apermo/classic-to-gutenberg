@@ -6,8 +6,8 @@ namespace Apermo\ClassicToGutenberg\Admin;
 
 use Apermo\ClassicToGutenberg\ContentConverter;
 use Apermo\ClassicToGutenberg\Migration\MigrationRunner;
+use Apermo\ClassicToGutenberg\Permission;
 use WP_Post;
-
 /**
  * Adds row actions to the post list table for block conversion.
  */
@@ -336,16 +336,10 @@ class RowAction {
 	/**
 	 * Check whether the current user has permission to convert posts.
 	 *
-	 * Requires super admin on multisite, manage_options on single site.
-	 *
 	 * @return bool
 	 */
 	private function current_user_can_convert(): bool {
-		if ( is_multisite() ) {
-			return is_super_admin();
-		}
-
-		return current_user_can( 'manage_options' );
+		return Permission::user_can_convert();
 	}
 
 	/**

@@ -7,9 +7,9 @@ namespace Apermo\ClassicToGutenberg\CLI;
 use Apermo\ClassicToGutenberg\ContentConverter;
 use Apermo\ClassicToGutenberg\Migration\ClassicPostFinder;
 use Apermo\ClassicToGutenberg\Migration\MigrationRunner;
+use Apermo\ClassicToGutenberg\Permission;
 use WP_CLI;
 use WP_CLI\Utils;
-
 /**
  * WP-CLI command: classic-to-gutenberg convert.
  */
@@ -79,8 +79,7 @@ class ConvertCommand {
 			WP_CLI::error( 'No user set. Use --user=<id|login|email> to specify which user runs the conversion.' );
 		}
 
-		$is_admin = is_multisite() ? is_super_admin( $user->ID ) : user_can( $user, 'manage_options' );
-		if ( ! $is_admin ) {
+		if ( ! Permission::user_can_convert( $user ) ) {
 			WP_CLI::error( \sprintf( 'User "%s" does not have sufficient permissions.', $user->user_login ) );
 		}
 
