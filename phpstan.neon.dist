@@ -4,5 +4,6 @@ parameters:
         - src
         - plugin.php
         - uninstall.php
-    excludePaths:
-        - src/CLI
+    scanFiles:
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-commands-stubs.php

@@ -67,7 +67,7 @@ class ConvertCommand {
 	 * @return void
 	 */
 	public function execute( array $args, array $assoc_args ): void {
-		$dry_run    = Utils\get_flag_value( $assoc_args, 'dry-run', false );
+		$dry_run    = (bool) Utils\get_flag_value( $assoc_args, 'dry-run', false );
 		$batch_size = (int) ( $assoc_args['batch-size'] ?? 50 );
 		$finder     = new ClassicPostFinder();
 		$runner     = new MigrationRunner( $this->converter );
@@ -99,7 +99,7 @@ class ConvertCommand {
 				break;
 			}
 
-			$results = $runner->convert_batch( $post_ids, (bool) $dry_run );
+			$results = $runner->convert_batch( $post_ids, $dry_run );
 
 			foreach ( $results as $result ) {
 				if ( $result->success ) {
