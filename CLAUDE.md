@@ -18,7 +18,17 @@ WordPress plugin for batch migration of classic editor content to Gutenberg bloc
   - `AbstractBlockConverter.php` — Base class with shared serialization helpers
   - `ParagraphConverter.php`, `HeadingConverter.php`, etc. — Individual converters
   - `HtmlBlockConverter.php` — Fallback for unrecognized HTML
-- `src/Migration/` — Batch migration orchestration (planned)
+- `src/ContentConverter.php` — Full conversion pipeline (wpautop → split → convert → join)
+- `src/Parser/` — HTML parsing
+  - `TopLevelSplitter.php` — Regex-based scanner splitting wpautop'd HTML into top-level elements
+  - `TopLevelElement.php` — Value object for parsed elements
+- `src/Migration/` — Batch migration orchestration
+  - `ClassicPostFinder.php` — SQL query for posts without block markup
+  - `MigrationRunner.php` — Convert posts with dry-run and revision-based rollback
+  - `MigrationRollback.php` — Restore pre-conversion content from revisions
+  - `MigrationResult.php` — Value object for migration results
+- `src/CLI/` — WP-CLI commands (status, convert, rollback)
+- `src/Admin/` — Row actions and admin notices
 - `uninstall.php` — Cleanup on plugin deletion
 
 ### Key conventions
@@ -64,7 +74,14 @@ ddev start && ddev orchestrate   # Full WordPress environment
 
 - Uses `apermo/ddev-orchestrate` addon
 - Project type is `php` (not `wordpress`), so WP-CLI uses a custom `ddev wp` command wrapper
-- Bind-mounts repo into `wp-content/plugins/`
+- Symlinks repo into `wp-content/plugins/` via addon's link fragment
+- Custom fragment `50-import-testdata.sh` imports E2E fixtures (workaround for apermo/ddev-orchestrate#3)
+
+## Git Workflow
+
+**Never push directly to main.** All changes go through feature branches and pull requests.
+
+Branch naming: `<type>/<short-description>` (e.g. `feat/gallery-converter`, `fix/br-normalization`).
 
 ## Git Hooks
 
