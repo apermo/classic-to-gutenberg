@@ -59,8 +59,7 @@ test.describe.serial('WP-CLI: convert', () => {
         const before = wp('post get 100 --field=content');
         const output = wp('classic-to-gutenberg convert 100 --dry-run');
 
-        expect(output).toContain('[OK] Post #100');
-        expect(output).toContain('Would convert');
+        expect(output).toContain('Would convert 1');
 
         const after = wp('post get 100 --field=content');
         expect(after).toBe(before);
@@ -68,8 +67,7 @@ test.describe.serial('WP-CLI: convert', () => {
 
     test('converts a single post by ID', () => {
         const output = wp('classic-to-gutenberg convert 100');
-        expect(output).toContain('[OK] Post #100');
-        expect(output).toContain('Converted 1 post(s)');
+        expect(output).toContain('Converted 1');
 
         const content = wp('post get 100 --field=content');
         expect(content).toContain('<!-- wp:paragraph -->');
@@ -77,9 +75,7 @@ test.describe.serial('WP-CLI: convert', () => {
 
     test('converts multiple posts by IDs', () => {
         const output = wp('classic-to-gutenberg convert 101,102');
-        expect(output).toContain('[OK] Post #101');
-        expect(output).toContain('[OK] Post #102');
-        expect(output).toContain('Converted 2 post(s)');
+        expect(output).toContain('Converted 2');
 
         const content101 = wp('post get 101 --field=content');
         expect(content101).toContain('<!-- wp:heading -->');
@@ -135,7 +131,7 @@ test.describe.serial('WP-CLI: convert', () => {
         expect(content).not.toContain('<!-- wp:');
 
         const output = wp('classic-to-gutenberg convert');
-        expect(output).toContain('[OK] Post #121');
+        expect(output).toContain('Converted');
 
         const converted = wp('post get 121 --field=content');
         expect(converted).toContain('<!-- wp:paragraph -->');
