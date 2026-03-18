@@ -33,4 +33,9 @@
     </rule>
 
     <config name="minimum_wp_version" value="6.2"/>
+
+    <!-- Test files don't interact with the database. -->
+    <rule ref="WordPress.DB.DirectDatabaseQuery">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
 </ruleset>

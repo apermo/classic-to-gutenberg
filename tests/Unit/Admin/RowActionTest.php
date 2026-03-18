@@ -53,7 +53,7 @@ class RowActionTest extends TestCase {
 	 */
 	public function test_hides_actions_for_block_posts(): void {
 		$converter = Mockery::mock( ContentConverter::class );
-		$instance  = new RowAction( $converter );
+		$instance = new RowAction( $converter );
 
 		$post = Mockery::mock( WP_Post::class );
 		$post->ID = 42;
@@ -72,7 +72,7 @@ class RowActionTest extends TestCase {
 	 */
 	public function test_hides_actions_when_no_permission(): void {
 		$converter = Mockery::mock( ContentConverter::class );
-		$instance  = new RowAction( $converter );
+		$instance = new RowAction( $converter );
 
 		$post = Mockery::mock( WP_Post::class );
 		$post->ID = 42;
@@ -98,7 +98,7 @@ class RowActionTest extends TestCase {
 	 */
 	public function test_adds_actions_for_classic_posts(): void {
 		$converter = Mockery::mock( ContentConverter::class );
-		$instance  = new RowAction( $converter );
+		$instance = new RowAction( $converter );
 
 		$post = Mockery::mock( WP_Post::class );
 		$post->ID = 42;
@@ -134,7 +134,7 @@ class RowActionTest extends TestCase {
 	 */
 	public function test_adds_bulk_action(): void {
 		$converter = Mockery::mock( ContentConverter::class );
-		$instance  = new RowAction( $converter );
+		$instance = new RowAction( $converter );
 
 		Functions\stubs(
 			[
@@ -156,7 +156,7 @@ class RowActionTest extends TestCase {
 	 */
 	public function test_bulk_convert_ignores_other_actions(): void {
 		$converter = Mockery::mock( ContentConverter::class );
-		$instance  = new RowAction( $converter );
+		$instance = new RowAction( $converter );
 
 		$result = $instance->handle_bulk_convert( '/redirect', 'other_action', [ 1, 2 ] );
 

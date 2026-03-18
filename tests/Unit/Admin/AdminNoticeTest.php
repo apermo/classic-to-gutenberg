@@ -79,7 +79,7 @@ class AdminNoticeTest extends TestCase {
 	 * @return void
 	 */
 	public function test_success_notice_with_single_post(): void {
-		$post     = $this->mock_post( 42, 'Test Post' );
+		$post = $this->mock_post( 42, 'Test Post' );
 		$transient = [
 			'type'     => 'converted',
 			'post_ids' => [ 42 ],
@@ -118,8 +118,8 @@ class AdminNoticeTest extends TestCase {
 	 * @return void
 	 */
 	public function test_success_notice_with_multiple_posts(): void {
-		$post1    = $this->mock_post( 1, 'First' );
-		$post2    = $this->mock_post( 2, 'Second' );
+		$post1 = $this->mock_post( 1, 'First' );
+		$post2 = $this->mock_post( 2, 'Second' );
 		$transient = [
 			'type'     => 'converted',
 			'post_ids' => [ 1, 2 ],

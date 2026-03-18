@@ -159,7 +159,7 @@ class MigrationRunnerTest extends TestCase {
 		$runner   = new MigrationRunner( $converter );
 		$post     = $this->mock_post( 42, 'original' );
 		$wp_error = Mockery::mock( 'WP_Error' );
-		$wp_error->shouldReceive( 'get_error_message' )->andReturn( 'Update error occurred.' );
+		$wp_error->shouldReceive( 'get_error_message' )->andReturn( 'Save unsuccessful.' );
 
 		Functions\expect( 'get_post' )->with( 42 )->andReturn( $post );
 		Functions\expect( 'wp_check_post_lock' )->andReturn( false );
@@ -173,7 +173,7 @@ class MigrationRunnerTest extends TestCase {
 
 		$this->assertFalse( $result->success );
 		$this->assertSame( MigrationResult::ERROR_UPDATE_FAILED, $result->error_code );
-		$this->assertSame( 'Update error occurred.', $result->error );
+		$this->assertSame( 'Save unsuccessful.', $result->error );
 	}
 
 	/**
