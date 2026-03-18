@@ -1,6 +1,8 @@
 # Classic to Gutenberg
 
 [![PHP CI](https://github.com/apermo/classic-to-gutenberg/actions/workflows/ci.yml/badge.svg)](https://github.com/apermo/classic-to-gutenberg/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/apermo/classic-to-gutenberg/graph/badge.svg)](https://codecov.io/gh/apermo/classic-to-gutenberg)
+[![Packagist Version](https://img.shields.io/packagist/v/apermo/classic-to-gutenberg)](https://packagist.org/packages/apermo/classic-to-gutenberg)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPLv2+-blue.svg)](LICENSE)
 
 Batch migration of WordPress classic editor content to Gutenberg blocks.
@@ -88,11 +90,11 @@ On the Posts/Pages list screen, classic posts (without block markup) show two ad
 ## Development
 
 ```bash
-composer cs              # Run PHPCS
-composer cs:fix          # Fix PHPCS violations
-composer analyse         # Run PHPStan
-composer test            # Run all tests
-composer test:unit       # Run unit tests only
+composer cs               # Run PHPCS
+composer cs:fix           # Fix PHPCS violations
+composer analyse          # Run PHPStan
+composer test             # Run all tests
+composer test:unit        # Run unit tests only
 composer test:integration # Run integration tests only
 ```
 
@@ -109,6 +111,17 @@ Enable the pre-commit hook (PHPCS + PHPStan on staged files):
 ```bash
 git config core.hooksPath .githooks
 ```
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Acknowledgements
+
+Development of this plugin is supported by
+
+- [Coding Pioneers](https://coding-pioneers.com)
+- [Thomann](https://www.thomann.de)
 
 ## License
 
