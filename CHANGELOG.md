@@ -9,11 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--
+- Unit tests for MigrationRunner (8 tests)
+- Unit tests for ContentConverter (7 tests)
+- Unit tests for ClassicPostFinder (6 tests)
+- Unit tests for AdminNotice (7 tests)
+- Unit tests for RowAction (5 tests)
+- Fixture for styled paragraph edge case
 
 ### Fixed
 
--
+- Gallery output: missing line break after `<figure>` opening tag (#16)
+- Double `<p>` wrapping on styled paragraphs from wpautop (#17)
 
 ## [0.3.1] - 2026-03-18
 
