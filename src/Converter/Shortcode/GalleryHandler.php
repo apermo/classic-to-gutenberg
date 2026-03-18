@@ -37,7 +37,7 @@ class GalleryHandler implements ShortcodeHandlerInterface {
 
 		$columns_class = 'columns-' . $columns;
 		$figure        = '<figure class="wp-block-gallery has-nested-images ' . $columns_class . '">'
-			. $inner_blocks . '</figure>';
+			. "\n" . $inner_blocks . '</figure>';
 
 		return '<!-- wp:gallery ' . wp_json_encode( $block_attrs, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE ) . " -->\n"
 			. $figure . "\n"
