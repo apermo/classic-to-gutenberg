@@ -4,7 +4,8 @@ Contributions are welcome! This guide explains how to add new converters and wor
 
 ## What we merge
 
-Converters and shortcode handlers for **widely used, generic HTML patterns** and **WordPress core shortcodes** are welcome as pull requests. These benefit all users of the plugin.
+Converters and shortcode handlers for **widely used, generic HTML patterns** and
+**WordPress core shortcodes** are welcome as pull requests. These benefit all users of the plugin.
 
 **Examples of mergeable contributions:**
 
@@ -15,7 +16,8 @@ Converters and shortcode handlers for **widely used, generic HTML patterns** and
 
 ## What we don't merge
 
-Converters for **page builders, third-party plugins, or site-specific markup** are too niche for the core plugin. These should live in your own code (a custom plugin or theme) and use the filter hooks to register.
+Converters for **page builders, third-party plugins, or site-specific markup** are too niche for the core plugin.
+These should live in your own code (a custom plugin or theme) and use the filter hooks to register.
 
 **Examples of contributions that won't be merged:**
 
