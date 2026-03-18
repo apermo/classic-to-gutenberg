@@ -26,6 +26,9 @@ These should live in your own code (a custom plugin or theme) and use the filter
 - A shortcode handler for a specific form plugin (`[ninja_form id="5"]`)
 - Site-specific markup patterns (`<div class="my-company-widget">`)
 
+A companion library with ready-made converters for common page builders is planned
+([coming soon](https://github.com/apermo/classic-to-gutenberg/issues/18)).
+
 ### How to implement niche converters
 
 Register them via filter in your own plugin:
