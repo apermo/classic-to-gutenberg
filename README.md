@@ -120,7 +120,7 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
 
 Development of this plugin is supported by
 
-- [Coding Pioneers](https://www.coding-pioneers.com)
+- [Coding Pioneers](https://coding-pioneers.com)
 - [Thomann](https://www.thomann.de)
 
 ## License
