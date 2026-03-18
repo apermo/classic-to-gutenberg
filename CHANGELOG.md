@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Converter chaining: multiple converters per tag with LIFO fallthrough (#20)
+- WP-CLI `detect` command for finding unparseable content (#15)
+- Integration test coverage uploaded to Codecov (#21)
 - Unit tests for MigrationRunner (8 tests)
 - Unit tests for ContentConverter (7 tests)
 - Unit tests for ClassicPostFinder (6 tests)

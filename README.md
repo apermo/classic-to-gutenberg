@@ -38,7 +38,11 @@ wp classic-to-gutenberg convert --dry-run
 wp classic-to-gutenberg convert
 
 # Convert specific post types
-wp classic-to-gutenberg convert --post-type=post,page --batch-size=100
+wp classic-to-gutenberg convert --post-type=post,page
+
+# Detect unparseable content before converting
+wp classic-to-gutenberg detect
+wp classic-to-gutenberg detect --format=csv
 
 # Rollback a converted post
 wp classic-to-gutenberg rollback 42
