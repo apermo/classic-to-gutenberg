@@ -13,5 +13,4 @@ parameters:
             reportUnmatched: false
         -
             message: '#Comparison operation .* between int<1, max> and 0 is always true#'
-            path: src/CLI/ConvertCommand.php
             reportUnmatched: false
