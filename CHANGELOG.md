@@ -5,11 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.1] - Unreleased
+## [0.3.1] - 2026-03-18
 
 ### Added
 
 - Acknowledgements section in README
+- Contributing section in README
+- Merge policy with examples in CONTRIBUTING.md
+- Planned add-ons library note in CONTRIBUTING.md
+- Codecov integration and badge
+- Packagist version badge
+
+### Fixed
+
+- Author email in composer.json
+- PHPStan false positives on int comparison (moved to config-level ignores)
 
 ## [0.3.0] - 2026-03-15
 

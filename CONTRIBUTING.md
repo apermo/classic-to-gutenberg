@@ -31,22 +31,28 @@ A companion library with ready-made converters for common page builders is plann
 
 ### How to implement niche converters
 
-Register them via filter in your own plugin:
+Register them via filter in your own plugin or theme:
 
 ```php
-add_filter( 'classic_to_gutenberg_converters', function ( $factory ) {
-    $factory->register( new My_Elementor_Converter() );
-    return $factory;
-} );
+add_filter(
+	'classic_to_gutenberg_converters',
+	static function ( BlockConverterFactory $factory ): BlockConverterFactory {
+		$factory->register( new My_Elementor_Converter() );
+		return $factory;
+	},
+);
 ```
 
 Or for shortcode handlers:
 
 ```php
-add_filter( 'classic_to_gutenberg_shortcode_handlers', function ( $handlers ) {
-    $handlers[] = new My_Custom_Shortcode_Handler();
-    return $handlers;
-} );
+add_filter(
+	'classic_to_gutenberg_shortcode_handlers',
+	static function ( array $handlers ): array {
+		$handlers[] = new My_Custom_Shortcode_Handler();
+		return $handlers;
+	},
+);
 ```
 
 ## Adding a Converter
