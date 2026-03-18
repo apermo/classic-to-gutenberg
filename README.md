@@ -110,6 +110,13 @@ Enable the pre-commit hook (PHPCS + PHPStan on staged files):
 git config core.hooksPath .githooks
 ```
 
+## Acknowledgements
+
+Development of this plugin is supported by
+
+- [Coding Pioneers](https://www.coding-pioneers.com)
+- [Thomann](https://www.thomann.de)
+
 ## License
 
 [GPL-2.0-or-later](LICENSE)
