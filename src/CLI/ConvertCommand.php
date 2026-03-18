@@ -94,6 +94,7 @@ class ConvertCommand {
 		}
 
 		// Disable output buffering for responsive CLI output.
+		// @phpstan-ignore greater.alwaysTrue
 		while ( \ob_get_level() > 0 ) {
 			\ob_end_flush();
 		}
