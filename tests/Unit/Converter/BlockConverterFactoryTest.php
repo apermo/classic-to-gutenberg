@@ -113,6 +113,56 @@ class BlockConverterFactoryTest extends TestCase {
 	}
 
 	/**
+	 * Falls through to earlier converter when later one rejects.
+	 *
+	 * @return void
+	 */
+	public function test_falls_through_to_earlier_converter(): void {
+		$fallback = new HtmlBlockConverter();
+		$factory  = new BlockConverterFactory( $fallback );
+
+		$general = $this->createMock( BlockConverterInterface::class );
+		$general->method( 'get_supported_tags' )->willReturn( [ 'img' ] );
+		$general->method( 'can_convert' )->willReturn( true );
+
+		$specific = $this->createMock( BlockConverterInterface::class );
+		$specific->method( 'get_supported_tags' )->willReturn( [ 'img' ] );
+		$specific->method( 'can_convert' )->willReturn( false );
+
+		$factory->register( $general );
+		$factory->register( $specific );
+
+		$result = $factory->get_converter( 'img', '<img src="test.jpg" />' );
+
+		$this->assertSame( $general, $result );
+	}
+
+	/**
+	 * Falls back to fallback when all converters in stack reject.
+	 *
+	 * @return void
+	 */
+	public function test_falls_back_when_all_reject(): void {
+		$fallback = new HtmlBlockConverter();
+		$factory  = new BlockConverterFactory( $fallback );
+
+		$first = $this->createMock( BlockConverterInterface::class );
+		$first->method( 'get_supported_tags' )->willReturn( [ 'div' ] );
+		$first->method( 'can_convert' )->willReturn( false );
+
+		$second = $this->createMock( BlockConverterInterface::class );
+		$second->method( 'get_supported_tags' )->willReturn( [ 'div' ] );
+		$second->method( 'can_convert' )->willReturn( false );
+
+		$factory->register( $first );
+		$factory->register( $second );
+
+		$result = $factory->get_converter( 'div', '<div>content</div>' );
+
+		$this->assertSame( $fallback, $result );
+	}
+
+	/**
 	 * Returns all registered converters via get_converters.
 	 *
 	 * @return void
