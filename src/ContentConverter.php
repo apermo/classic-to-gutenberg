@@ -72,6 +72,8 @@ class ContentConverter {
 
 		$content = ( $this->wpautop )( $content );
 
+		$content = $this->unwrap_double_paragraphs( $content );
+
 		$content = $this->restore_special_comments( $content, $placeholders );
 
 		$elements = $this->splitter->split( $content );
@@ -138,6 +140,24 @@ class ContentConverter {
 		}
 
 		return $content;
+	}
+
+	/**
+	 * Unwrap double paragraph tags created by wpautop.
+	 *
+	 * WordPress wpautop wraps existing `<p style="...">` in another `<p>`, producing
+	 * `<p><p style="...">content</p></p>`. This strips the outer wrapper.
+	 *
+	 * @param string $content The wpautop'd content.
+	 *
+	 * @return string
+	 */
+	private function unwrap_double_paragraphs( string $content ): string {
+		return (string) \preg_replace(
+			'/<p>\s*(<p\s[^>]*>.*?<\/p>)\s*<\/p>/s',
+			'$1',
+			$content,
+		);
 	}
 
 	/**
