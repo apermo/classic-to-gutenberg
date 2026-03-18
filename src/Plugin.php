@@ -39,6 +39,7 @@ class Plugin {
 					$converter = self::create_content_converter();
 					CLI\StatusCommand::register();
 					CLI\ConvertCommand::register( $converter );
+					CLI\DetectCommand::register( $converter );
 					CLI\RollbackCommand::register();
 				},
 			);
