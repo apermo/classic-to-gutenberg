@@ -88,11 +88,11 @@ On the Posts/Pages list screen, classic posts (without block markup) show two ad
 ## Development
 
 ```bash
-composer cs              # Run PHPCS
-composer cs:fix          # Fix PHPCS violations
-composer analyse         # Run PHPStan
-composer test            # Run all tests
-composer test:unit       # Run unit tests only
+composer cs               # Run PHPCS
+composer cs:fix           # Fix PHPCS violations
+composer analyse          # Run PHPStan
+composer test             # Run all tests
+composer test:unit        # Run unit tests only
 composer test:integration # Run integration tests only
 ```
 
@@ -109,6 +109,10 @@ Enable the pre-commit hook (PHPCS + PHPStan on staged files):
 ```bash
 git config core.hooksPath .githooks
 ```
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Acknowledgements
 
