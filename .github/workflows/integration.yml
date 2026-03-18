@@ -40,6 +40,5 @@ jobs:
             wp-versions: ${{ needs.detect-wp-minimum.outputs.wp-versions }}
             multisite: 'both'
             php-version-coverage: '8.4'
-            codecov-upload: true
         secrets:
             codecov-token: ${{ secrets.CODECOV_TOKEN }}
