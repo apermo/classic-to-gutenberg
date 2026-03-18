@@ -159,6 +159,7 @@ class MigrationRunnerTest extends TestCase {
 		$runner   = new MigrationRunner( $converter );
 		$post     = $this->mock_post( 42, 'original' );
 		$wp_error = Mockery::mock( 'WP_Error' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange -- false positive on string "failed".
 		$wp_error->shouldReceive( 'get_error_message' )->andReturn( 'Update failed.' );
 
 		Functions\expect( 'get_post' )->with( 42 )->andReturn( $post );
@@ -173,6 +174,7 @@ class MigrationRunnerTest extends TestCase {
 
 		$this->assertFalse( $result->success );
 		$this->assertSame( MigrationResult::ERROR_UPDATE_FAILED, $result->error_code );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange -- false positive on string "failed".
 		$this->assertSame( 'Update failed.', $result->error );
 	}
 

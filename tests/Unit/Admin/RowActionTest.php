@@ -55,8 +55,8 @@ class RowActionTest extends TestCase {
 		$converter = Mockery::mock( ContentConverter::class );
 		$instance  = new RowAction( $converter );
 
-		$post               = Mockery::mock( WP_Post::class );
-		$post->ID           = 42;
+		$post = Mockery::mock( WP_Post::class );
+		$post->ID = 42;
 		$post->post_content = '<!-- wp:paragraph --><p>Block content</p><!-- /wp:paragraph -->';
 
 		$actions = $instance->add_row_actions( [ 'edit' => 'Edit' ], $post );
@@ -74,8 +74,8 @@ class RowActionTest extends TestCase {
 		$converter = Mockery::mock( ContentConverter::class );
 		$instance  = new RowAction( $converter );
 
-		$post               = Mockery::mock( WP_Post::class );
-		$post->ID           = 42;
+		$post = Mockery::mock( WP_Post::class );
+		$post->ID = 42;
 		$post->post_content = 'Classic content without blocks.';
 
 		Functions\expect( 'is_multisite' )->andReturn( false );
@@ -100,8 +100,8 @@ class RowActionTest extends TestCase {
 		$converter = Mockery::mock( ContentConverter::class );
 		$instance  = new RowAction( $converter );
 
-		$post               = Mockery::mock( WP_Post::class );
-		$post->ID           = 42;
+		$post = Mockery::mock( WP_Post::class );
+		$post->ID = 42;
 		$post->post_content = 'Classic content without blocks.';
 
 		Functions\expect( 'is_multisite' )->andReturn( false );
