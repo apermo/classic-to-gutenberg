@@ -153,11 +153,19 @@ class ContentConverter {
 	 * @return string
 	 */
 	private function unwrap_double_paragraphs( string $content ): string {
-		return (string) \preg_replace(
+		$result = \preg_replace(
 			'/<p>\s*(<p\s[^>]*>.*?<\/p>)\s*<\/p>/s',
 			'$1',
 			$content,
 		);
+
+		if ( $result === null ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- intentional diagnostic logging.
+			\error_log( 'classic-to-gutenberg: preg_replace failed in unwrap_double_paragraphs' );
+			return $content;
+		}
+
+		return $result;
 	}
 
 	/**

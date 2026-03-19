@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Apermo\ClassicToGutenberg\CLI;
 
 use Apermo\ClassicToGutenberg\ContentConverter;
-use Apermo\ClassicToGutenberg\Migration\ClassicPostFinder;
 use WP_CLI;
 use WP_CLI\Utils;
 
@@ -16,6 +15,8 @@ use WP_CLI\Utils;
  * to the core/html fallback block (unparseable content).
  */
 class DetectCommand {
+
+	use PostIdParserTrait;
 
 	/**
 	 * The content converter.
@@ -116,49 +117,6 @@ class DetectCommand {
 	}
 
 	/**
-	 * Parse post IDs from positional arguments.
-	 *
-	 * @param string[] $args Positional arguments.
-	 *
-	 * @return int[]
-	 */
-	private function parse_post_ids( array $args ): array {
-		if ( $args === [] ) {
-			return [];
-		}
-
-		$post_ids = [];
-		foreach ( $args as $argument ) {
-			foreach ( \explode( ',', $argument ) as $part ) {
-				$part = \trim( $part );
-				if ( $part !== '' && \ctype_digit( $part ) ) {
-					$post_ids[] = (int) $part;
-				}
-			}
-		}
-
-		return $post_ids;
-	}
-
-	/**
-	 * Find classic posts via query.
-	 *
-	 * @param array<string,string> $assoc_args Associative arguments.
-	 *
-	 * @return int[]
-	 */
-	private function find_classic_posts( array $assoc_args ): array {
-		$finder     = new ClassicPostFinder();
-		$query_args = [];
-
-		if ( isset( $assoc_args['post-type'] ) ) {
-			$query_args['post_type'] = \explode( ',', $assoc_args['post-type'] );
-		}
-
-		return $finder->find( $query_args );
-	}
-
-	/**
 	 * Scan posts for unparseable content.
 	 *
 	 * @param int[] $post_ids Post IDs to scan.
@@ -210,7 +168,7 @@ class DetectCommand {
 			$matches,
 		);
 
-		return $matches[1];
+		return $matches[1] ?? []; // @phpstan-ignore nullCoalesce.offset
 	}
 
 	/**
@@ -224,6 +182,7 @@ class DetectCommand {
 		$snippet = \trim( $snippet );
 		$snippet = \preg_replace( '/\s+/', ' ', $snippet ) ?? $snippet;
 
+		// Truncate to 80 chars max (77 + "...") for CLI table column width.
 		if ( \strlen( $snippet ) > 80 ) {
 			return \substr( $snippet, 0, 77 ) . '...';
 		}

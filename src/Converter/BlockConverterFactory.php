@@ -76,6 +76,7 @@ class BlockConverterFactory {
 		$tag = \strtolower( $tag_name );
 
 		if ( isset( $this->converters[ $tag ] ) ) {
+			// TODO: Iterate from end without copying when priority support is added (#20).
 			$stack = \array_reverse( $this->converters[ $tag ] );
 			foreach ( $stack as $converter ) {
 				if ( $converter->can_convert( $tag, $html ) ) {

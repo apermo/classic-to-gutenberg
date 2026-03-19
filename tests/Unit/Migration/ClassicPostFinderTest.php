@@ -189,15 +189,9 @@ class ClassicPostFinderTest extends TestCase {
 		$wpdb        = Mockery::mock( 'wpdb' );
 		$wpdb->posts = 'wp_posts';
 
-		$wpdb->last_prepared_query = '';
-		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing(
-				static function () use ( $wpdb ): string {
-					$args                      = \func_get_args();
-					$wpdb->last_prepared_query = $args[0];
-					return $args[0];
-				},
-			);
+		$wpdb->shouldReceive( 'prepare' )->andReturnUsing(
+			static fn(): string => \func_get_args()[0],
+		);
 		$wpdb->shouldReceive( 'get_col' )->andReturn( $col_result );
 
 		return $wpdb;
