@@ -39,3 +39,6 @@ jobs:
                     || '["8.2","8.4"]' }}
             wp-versions: ${{ needs.detect-wp-minimum.outputs.wp-versions }}
             multisite: 'both'
+            php-version-coverage: '8.4'
+        secrets:
+            codecov-token: ${{ secrets.CODECOV_TOKEN }}

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-03-23
+
+### Added
+
+- Converter chaining: multiple converters per tag with LIFO fallthrough (#20)
+- WP-CLI `detect` command for finding unparseable content (#15)
+- Integration test coverage uploaded to Codecov (#21)
+- Unit tests for MigrationRunner (8 tests)
+- Unit tests for ContentConverter (7 tests)
+- Unit tests for ClassicPostFinder (6 tests)
+- Unit tests for AdminNotice (7 tests)
+- Unit tests for RowAction (5 tests)
+- Fixture for styled paragraph edge case
+
+### Fixed
+
+- Gallery output: missing line break after `<figure>` opening tag (#16)
+- Double `<p>` wrapping on styled paragraphs from wpautop (#17)
+
 ## [0.3.1] - 2026-03-18
 
 ### Added
