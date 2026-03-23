@@ -13,7 +13,7 @@ const FIXTURES_SQL = 'tests/fixtures/testdata.sql';
  */
 function wp(command) {
     const cmd = USE_DDEV
-        ? `ddev wp ${command}`
+        ? `ddev wp ${command} --user=admin`
         : `wp ${command} --path=${WP_PATH} --allow-root --user=admin`;
 
     return execSync(cmd, {
