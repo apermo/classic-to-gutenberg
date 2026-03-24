@@ -31,9 +31,7 @@ abstract class AbstractBlockConverter implements BlockConverterInterface {
 	 * @return string
 	 */
 	protected function wrap_block( string $block_name, string $content, array $attrs = [] ): string {
-		$attrs_string = $attrs !== [] ? ' ' . wp_json_encode( $attrs, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE ) : '';
-
-		return "<!-- wp:{$block_name}{$attrs_string} -->\n{$content}\n<!-- /wp:{$block_name} -->";
+		return BlockMarkup::wrap( $block_name, $content, $attrs );
 	}
 
 	/**
@@ -45,8 +43,6 @@ abstract class AbstractBlockConverter implements BlockConverterInterface {
 	 * @return string
 	 */
 	protected function self_closing_block( string $block_name, array $attrs = [] ): string {
-		$attrs_string = $attrs !== [] ? ' ' . wp_json_encode( $attrs, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE ) : '';
-
-		return "<!-- wp:{$block_name}{$attrs_string} /-->";
+		return BlockMarkup::self_closing( $block_name, $attrs );
 	}
 }
