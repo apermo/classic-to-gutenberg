@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Migration;
 
-use Apermo\ClassicToGutenberg\ContentConverter;
+use Apermo\ClassicToGutenberg\ContentConverterInterface;
 
 /**
  * Runs the migration for individual posts or batches.
@@ -14,16 +14,16 @@ class MigrationRunner {
 	/**
 	 * The content converter.
 	 *
-	 * @var ContentConverter
+	 * @var ContentConverterInterface
 	 */
-	private ContentConverter $converter;
+	private ContentConverterInterface $converter;
 
 	/**
 	 * Create a new migration runner.
 	 *
-	 * @param ContentConverter $converter The content converter.
+	 * @param ContentConverterInterface $converter The content converter.
 	 */
-	public function __construct( ContentConverter $converter ) {
+	public function __construct( ContentConverterInterface $converter ) {
 		$this->converter = $converter;
 	}
 

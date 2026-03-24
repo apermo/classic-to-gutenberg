@@ -12,7 +12,7 @@ use Closure;
 /**
  * Full content conversion pipeline: raw classic content to Gutenberg blocks.
  */
-class ContentConverter {
+class ContentConverter implements ContentConverterInterface {
 
 	/**
 	 * The block converter factory.

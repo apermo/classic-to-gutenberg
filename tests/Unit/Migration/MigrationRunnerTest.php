@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\ClassicToGutenberg\Tests\Unit\Migration;
 
-use Apermo\ClassicToGutenberg\ContentConverter;
+use Apermo\ClassicToGutenberg\ContentConverterInterface;
 use Apermo\ClassicToGutenberg\Migration\MigrationResult;
 use Apermo\ClassicToGutenberg\Migration\MigrationRunner;
 use Brain\Monkey;
@@ -44,7 +44,7 @@ class MigrationRunnerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_returns_failure_when_post_not_found(): void {
-		$converter = Mockery::mock( ContentConverter::class );
+		$converter = Mockery::mock( ContentConverterInterface::class );
 		$runner    = new MigrationRunner( $converter );
 
 		Functions\expect( 'get_post' )->with( 999 )->andReturn( null );
@@ -61,7 +61,7 @@ class MigrationRunnerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_returns_failure_when_post_locked(): void {
-		$converter = Mockery::mock( ContentConverter::class );
+		$converter = Mockery::mock( ContentConverterInterface::class );
 		$runner    = new MigrationRunner( $converter );
 		$post      = $this->mock_post( 42, 'classic content' );
 
@@ -80,7 +80,7 @@ class MigrationRunnerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_dry_run_does_not_save(): void {
-		$converter = Mockery::mock( ContentConverter::class );
+		$converter = Mockery::mock( ContentConverterInterface::class );
 		$converter->shouldReceive( 'convert' )
 			->with( 'classic content' )
 			->andReturn( '<!-- wp:paragraph --><p>classic content</p><!-- /wp:paragraph -->' );
@@ -103,7 +103,7 @@ class MigrationRunnerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_dry_run_skips_lock_check(): void {
-		$converter = Mockery::mock( ContentConverter::class );
+		$converter = Mockery::mock( ContentConverterInterface::class );
 		$converter->shouldReceive( 'convert' )->andReturn( 'converted' );
 
 		$runner = new MigrationRunner( $converter );
@@ -123,7 +123,7 @@ class MigrationRunnerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_successful_conversion_flow(): void {
-		$converter = Mockery::mock( ContentConverter::class );
+		$converter = Mockery::mock( ContentConverterInterface::class );
 		$converter->shouldReceive( 'convert' )
 			->with( 'original' )
 			->andReturn( 'converted' );
@@ -153,7 +153,7 @@ class MigrationRunnerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_returns_failure_when_update_fails(): void {
-		$converter = Mockery::mock( ContentConverter::class );
+		$converter = Mockery::mock( ContentConverterInterface::class );
 		$converter->shouldReceive( 'convert' )->andReturn( 'converted' );
 
 		$runner   = new MigrationRunner( $converter );
@@ -182,7 +182,7 @@ class MigrationRunnerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_batch_converts_all_posts(): void {
-		$converter = Mockery::mock( ContentConverter::class );
+		$converter = Mockery::mock( ContentConverterInterface::class );
 		$converter->shouldReceive( 'convert' )->andReturn( 'converted' );
 
 		$runner = new MigrationRunner( $converter );
@@ -212,7 +212,7 @@ class MigrationRunnerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_skips_revision_meta_when_no_revision_created(): void {
-		$converter = Mockery::mock( ContentConverter::class );
+		$converter = Mockery::mock( ContentConverterInterface::class );
 		$converter->shouldReceive( 'convert' )->andReturn( 'converted' );
 
 		$runner = new MigrationRunner( $converter );
