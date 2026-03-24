@@ -17,7 +17,7 @@ final class BlockMarkup {
 	/**
 	 * Wrap content in a Gutenberg block comment delimiter.
 	 *
-	 * @param string               $block_name Block name without core/ prefix (e.g. 'paragraph').
+	 * @param string               $block_name Block name (e.g. 'paragraph' or 'my-plugin/my-block').
 	 * @param string               $content    The inner HTML content.
 	 * @param array<string, mixed> $attrs      Block attributes.
 	 *
@@ -32,7 +32,7 @@ final class BlockMarkup {
 	/**
 	 * Create a self-closing Gutenberg block.
 	 *
-	 * @param string               $block_name Block name without core/ prefix.
+	 * @param string               $block_name Block name (e.g. 'nextpage' or 'my-plugin/my-block').
 	 * @param array<string, mixed> $attrs      Block attributes.
 	 *
 	 * @return string
