@@ -23,6 +23,8 @@ if ( $wp_tests_dir !== false && is_dir( $wp_tests_dir ) ) {
 	tests_add_filter( 'muplugins_loaded', 'classic_to_gutenberg_tests_load_project' );
 
 	require_once $wp_tests_dir . '/includes/bootstrap.php';
+} else {
+	require_once __DIR__ . '/Support/WPHTMLTagProcessorStub.php';
 }
 
 /**
