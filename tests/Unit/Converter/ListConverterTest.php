@@ -21,7 +21,7 @@ class ListConverterTest extends ConverterTestCase {
 
 		$this->assertFalse( $converter->can_convert( 'ol', '<ol><li>One</li>' ) );
 		$this->assertSame(
-			implode(
+			\implode(
 				"\n",
 				[
 					'<!-- wp:list {"ordered":true} -->',

@@ -19,7 +19,7 @@ class CaptionHandlerTest extends ConverterTestCase {
 	 */
 	public function test_converts_caption_shortcode(): void {
 		$this->assertSame(
-			implode(
+			\implode(
 				"\n",
 				[
 					'<!-- wp:image {"id":55,"align":"right","width":300,"height":200} -->',

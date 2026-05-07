@@ -18,7 +18,7 @@ class ImageConverterTest extends ConverterTestCase {
 	 */
 	public function test_extracts_attrs_from_standalone_image(): void {
 		$this->assertSame(
-			implode(
+			\implode(
 				"\n",
 				[
 					'<!-- wp:image {"id":42,"align":"center","width":640,"height":480} -->',

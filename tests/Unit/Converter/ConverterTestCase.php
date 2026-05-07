@@ -9,7 +9,7 @@ use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Base class for isolated converter tests.
+ * Provides the base class for isolated converter tests.
  */
 abstract class ConverterTestCase extends TestCase {
 

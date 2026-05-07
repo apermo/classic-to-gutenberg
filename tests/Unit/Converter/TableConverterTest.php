@@ -21,7 +21,7 @@ class TableConverterTest extends ConverterTestCase {
 
 		$this->assertFalse( $converter->can_convert( 'table', '<table><tr><td>A</td></tr></table>' ) );
 		$this->assertSame(
-			implode(
+			\implode(
 				"\n",
 				[
 					'<!-- wp:table -->',

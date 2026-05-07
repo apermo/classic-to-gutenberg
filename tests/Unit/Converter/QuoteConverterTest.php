@@ -18,7 +18,7 @@ class QuoteConverterTest extends ConverterTestCase {
 	 */
 	public function test_wraps_paragraphs_and_unwraps_cite_paragraph(): void {
 		$this->assertSame(
-			implode(
+			\implode(
 				"\n",
 				[
 					'<!-- wp:quote -->',

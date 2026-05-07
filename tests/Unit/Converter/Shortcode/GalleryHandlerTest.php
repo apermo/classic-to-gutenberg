@@ -19,7 +19,7 @@ class GalleryHandlerTest extends ConverterTestCase {
 	 */
 	public function test_converts_ids_columns_and_link_mode(): void {
 		$this->assertSame(
-			implode(
+			\implode(
 				"\n",
 				[
 					'<!-- wp:gallery {"columns":2,"linkTo":"media"} -->',
