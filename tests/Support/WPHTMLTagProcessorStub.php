@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// phpcs:disable
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound
 
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	/**
