@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-05-25
+
+### Fixed
+
+- Bootstrap in `plugin.php` no longer false-positives the "Please run
+  `composer install`" notice when the plugin runs inside a
+  Composer-managed parent project (Bedrock and similar). The check now
+  loads the local autoloader if present, then verifies `Plugin` is
+  reachable (via either the local or the parent autoloader) before
+  showing the notice. See
+  [#49](https://github.com/apermo/classic-to-gutenberg/issues/49).
+
 ## [0.5.0] - 2026-03-24
 
 ### Added

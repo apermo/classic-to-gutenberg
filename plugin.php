@@ -21,7 +21,11 @@ namespace Apermo\ClassicToGutenberg;
 \define( 'CLASSIC_TO_GUTENBERG_FILE', __FILE__ );
 \define( 'CLASSIC_TO_GUTENBERG_DIR', plugin_dir_path( __FILE__ ) );
 
-if ( ! \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor/autoload.php';
+}
+
+if ( ! \class_exists( Plugin::class ) ) {
 	add_action( 'admin_notices', 'Apermo\ClassicToGutenberg\ctg_missing_autoloader_notice' );
 	return;
 }
@@ -43,7 +47,5 @@ function ctg_missing_autoloader_notice(): void {
 		),
 	);
 }
-
-require_once __DIR__ . '/vendor/autoload.php';
 
 Plugin::init();
